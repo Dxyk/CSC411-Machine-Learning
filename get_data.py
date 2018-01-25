@@ -1,14 +1,14 @@
-from faces import *
+from util import *
 from pylab import *
 from scipy.misc import *
 import os
 import urllib
 
+# ----------- GLOBAL VARIABLES -----------
 # list of actors
 actors = list(set([a.split("\t")[0] for a in open("subset_actors.txt").readlines()]))
 
 
-# HELPER FUNCTIONS
 def rgb2gray(rgb):
     """Return the grayscale version of the RGB image rgb as a 2D numpy array
     whose range is 0..1
@@ -49,6 +49,7 @@ def timeout(func, args = (), kwargs = None, timeout_duration = 1,
         return it.result
 
 
+# ----------- Answers -----------
 # NOTE: create uncropped and cropped folder before running get_data()
 def get_data():
     testfile = urllib.URLopener()
@@ -89,6 +90,4 @@ def get_data():
 
 if __name__ == "__main__":
     # get_data()
-    count_actors()
-    for actor, count in actor_count.iteritems():
-        print "{} : {}".format(actor, count)
+    print_actor_count()

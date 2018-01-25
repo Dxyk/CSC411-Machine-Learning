@@ -1,3 +1,4 @@
+from util import *
 import get_data
 from pylab import *
 import numpy as np
@@ -11,30 +12,9 @@ import os
 from scipy.ndimage import filters
 import urllib
 
-# ----------- GLOBAL VARIABLES -----------
-# list of actors
-actors = list(set([a.split("\t")[0] for a in open("subset_actors.txt").readlines()]))
-# list of actors with their lower case last name
-actor_names = [actor.split()[1].lower() for actor in actors]
-# a dict of actor : count
-actor_count = {actor_name: 0 for actor_name in actor_names}
-
 
 # ----------- HELPER FUNCTIONS -----------
-def count_actors(path = "./cropped"):
-    """
-    Count all actor's images
-    Args:
-        path (str): the path to the data set
-    Returns:
-        A dict of actor if actor is not given
-    """
-    for root, dirs, images in os.walk(path):
-        for image in images:
-            for actor_name in actor_names:
-                if image.find(actor_name) != -1:
-                    actor_count[actor_name] += 1
-    return actor_count
+
 
 # ----------- Answers -----------
 
@@ -57,11 +37,12 @@ def divide_sets(actor, path = "./cropped"):
                 |test set|          == 10
     """
     if actor not in actor_count.keys():
-        print "Error: actor [{}] is not included in the data set".format(actor)
+        print "Error: actor [{1}] is not included in the data set".format(actor)
         raise ValueError("Actor not in the data set")
     if actor_count[actor] < 90:
-        print "Warning: actor [{}] does not have enough photos to satisfy the " \
-              "training requirement".format(actor)
+        print "Warning: actor [{0}] only has [{1}] of images, which does not have " \
+              "enough photos to satisfy the training " \
+              "requirement".format(actor, actor_count[actor])
     all_actor_image = [image for image in os.listdir(path) if actor in image]
     np.random.shuffle(all_actor_image)
     test_set = all_actor_image[0: 10]
@@ -71,6 +52,9 @@ def divide_sets(actor, path = "./cropped"):
 
 
 # Part 3
+def classify(actor1 = "baldwin", actor2 = "carell"):
+    actor1_training_set, actor1_validation_set, actor1_test_set = divide_sets(actor1)
+    actor2_training_set, actor2_validation_set, actor2_test_set = divide_sets(actor2)
 
 
 
@@ -95,7 +79,12 @@ def divide_sets(actor, path = "./cropped"):
 
 
 if __name__ == "__main__":
-    actor = "baldwin"
-    count_actors()
-    a, b, c = divide_sets(actor)
-    print "{}\n{}\n{}".format(a, b, c)
+    # part1
+
+    # part2
+    # actor = "baldwin"
+    # a, b, c = divide_sets(actor)
+    # print "{}\n{}\n{}".format(a, b, c)
+
+    # part3
+    classify()
