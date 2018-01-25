@@ -1,11 +1,11 @@
+from faces import *
 from pylab import *
-# import random
 from scipy.misc import *
 import os
 import urllib
 
-actors = list(
-    set([a.split("\t")[0] for a in open("subset_actors.txt").readlines()]))
+# list of actors
+actors = list(set([a.split("\t")[0] for a in open("subset_actors.txt").readlines()]))
 
 
 # HELPER FUNCTIONS
@@ -49,11 +49,9 @@ def timeout(func, args = (), kwargs = None, timeout_duration = 1,
         return it.result
 
 
-testfile = urllib.URLopener()
-
-
 # NOTE: create uncropped and cropped folder before running get_data()
 def get_data():
+    testfile = urllib.URLopener()
     for actor in actors:
         actor_name = actor.split()[1].lower()
         i = 0
@@ -79,7 +77,8 @@ def get_data():
                     i += 1
 
                 except Exception, e1:
-                    print "image {0}: {1}".format(filename, str(e1))
+                    print "Error image {0}: {1}".format(filename, str(e1))
+                    print "\t{0}".format(line)
                     if os.path.isfile("uncropped/" + filename):
                         os.remove("uncropped/" + filename)
                     if os.path.isfile("cropped/" + filename):
@@ -89,4 +88,7 @@ def get_data():
 
 
 if __name__ == "__main__":
-    get_data()
+    # get_data()
+    count_actors()
+    for actor, count in actor_count.iteritems():
+        print "{} : {}".format(actor, count)
