@@ -14,7 +14,16 @@ import urllib
 
 
 # ----------- HELPER FUNCTIONS -----------
+# noinspection PyTypeChecker
 def predict(im, theta):
+    """
+    Predicts the image using trained theta.
+    Args:
+        im (str): the image file name
+        theta (vector[float]): trained theta
+    Returns:
+        prediction based on the trained theta
+    """
     data = imread("./cropped/" + im) / 225.
     data = reshape(data, 1024)
     data = np.insert(data, 0, 1)
@@ -58,6 +67,7 @@ def divide_sets(actor, path = "./cropped"):
 
 
 # Part 3
+# noinspection PyTypeChecker
 def classify(actor1 = "baldwin", actor2 = "carell"):
     """
     Train and apply a linear classifier on actors 1 and 2
@@ -70,18 +80,23 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
         print "Error: actor(s) given is not in the data set"
         raise ValueError
 
-    # get total training set
+    # divide all sets
     actor1_training_set, actor1_validation_set, actor1_test_set = divide_sets(actor1)
     actor2_training_set, actor2_validation_set, actor2_test_set = divide_sets(actor2)
     training_set = actor1_training_set + actor2_training_set
     validation_set = actor1_validation_set + actor2_validation_set
     test_set = actor1_test_set + actor2_test_set
 
-    # initialize input, output and theta
+    # initialize input, output and theta to zeros
+    # Note: we are removing the bias term by adding a dummy term in x: x_0
+    # x: N * D matrix
+    # y: N * 1 vector
+    # theta: D * 1 vector
     x = np.zeros((len(training_set), 1025))
     y = np.zeros((len(training_set), 1))
     theta = np.zeros((1025, 1))
 
+    # fill the data with given data set
     i = 0
     for image in actor1_training_set:
         data = imread("./cropped/" + image) / 255.0
@@ -99,32 +114,31 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
         y[i] = 0
         i += 1
 
+    # use gradient descent to train theta
     theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
 
     # validate on validation set
+    print "----------- Validating -----------"
     total = len(validation_set)
     correct_count = 0
     for im in validation_set:
         prediction = predict(im, theta)
-        if im in actor1_validation_set:
-            if norm(prediction) > 0.5:
-                correct_count += 1
-        elif im in actor2_validation_set:
-            if norm(prediction) <= 0.5:
-                correct_count += 1
+        if im in actor1_validation_set and norm(prediction) > 0.5:
+            correct_count += 1
+        elif im in actor2_validation_set and norm(prediction) <= 0.5:
+            correct_count += 1
     print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
 
+    print "----------- Testing -----------"
     # test on test set
     total = len(test_set)
     correct_count = 0
-    for im in test_set:
+    for im in validation_set:
         prediction = predict(im, theta)
-        if im in actor1_test_set:
-            if norm(prediction) > 0.5:
-                correct_count += 1
-        elif im in actor2_test_set:
-            if norm(prediction) <= 0.5:
-                correct_count += 1
+        if im in actor1_validation_set and norm(prediction) > 0.5:
+            correct_count += 1
+        elif im in actor2_validation_set and norm(prediction) <= 0.5:
+            correct_count += 1
     print "Result on [Test Set]: {} / {}".format(correct_count, total)
 
 

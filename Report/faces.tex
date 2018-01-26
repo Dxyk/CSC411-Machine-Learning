@@ -237,68 +237,54 @@ The algorithm for separating the sets of data is to first shuffle the data as a 
 \end{homeworkProblem}
 \clearpage
 
-%%----------------------------------------------------------------------------------------
-%%	PROBLEM 3
-%%----------------------------------------------------------------------------------------
-%
-%\begin{homeworkProblem}
-%\noindent \textit{Reconstructing noiseless image using varying numbers of principal components.}
-%
-%We reconstruct the noiseless image \texttt{1000\_t.jpg} using the first $N$ principal components, for various $N$. The quality of the reconstruction increases as $n$ increases. For just $1$ principal component, we simply get the mean image. For $25$ principal components, we are basically able to reconstruct the letter. The output for $100$ principal components is fairly close to perfect. The reconstruction is perfect when we use all $625$ principal components, as expected. (Note: $625 = 25\times 25$ is the dimensionality of the images.)
-%
-%\textit{Advice: describe the quality of the results that you get. To the extent possible, explain why things are the way they are (e.g., why the reconstruction is perfect for $625$ components}.
-%
-%\begin{figure*}[!ht]
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{1pc.jpg}
-%  \caption{Reconstruction using \\1 principal component.}
-%  \label{fig:sfig1}
-%\end{subfigure}
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{5pc.jpg}
-%  \caption{Reconstruction using \\5 principal components.}
-%  \label{fig:sfig2}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{25pc.jpg}
-%  \caption{Reconstruction using \\25 principal components.}
-%  \label{fig:sfig3}
-%\end{subfigure}
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{100pc.jpg}
-%  \caption{Reconstruction using \\100 principal components.}
-%  \label{fig:sfig4}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{150pc.jpg}
-%  \caption{Reconstruction using \\150 principal components.}
-%  \label{fig:sfig5}
-%\end{subfigure}
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{200pc.jpg}
-%  \caption{Reconstruction using \\200 principal components.}
-%  \label{fig:sfig6}%
-%\end{subfigure}
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{400pc.jpg}
-%  \caption{Reconstruction using \\400 principal components.}
-%  \label{fig:sfig8}
-%\end{subfigure}
-%\begin{subfigure}{.35\textwidth}
-%  \includegraphics[width=.35\linewidth]{all_pc.jpg}
-%  \caption{Reconstruction using \\all 625 principal components.}
-%  \label{fig:sfig11}
-%\end{subfigure}
-%\caption{}
-%\label{fig:pcs}
-%\end{figure*}
-%
-%Figure~\ref{fig:pcs} demonstrates the effects of increasing the number of principal components.
-%These images were produced using the function \textbf{get\_reconstruction} (lines 65-70 and 158-164 of pca\_example.py).
-%
-%\end{homeworkProblem}
-%\clearpage
-%
+%----------------------------------------------------------------------------------------
+%	PROBLEM 3
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+\noindent \textit{Linear classifier to distinguish between Alec Baldwin from Steve Carell}
+
+Using the divided data sets from part 2, the program trains the linear classifier by gradient descent and then apply the classifier to the validation set and the test set.\\
+
+The functions to compute the output are as follows (all print statements are removed for simplicity):\\
+\begin{lstlisting}[language=Python, caption=Gradient Descent]
+def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
+	eps = 1e-5
+	prev_theta = init_theta - 10 * eps
+	theta = init_theta.copy()
+	max_iter = 100000
+	i = 0	
+	while norm(theta - prev_theta) > eps and i < max_iter:
+		prev_theta = theta.copy()
+		theta -= alpha * dlossdx(x, y, theta)
+		i += 1
+	return theta
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=Predict]
+def predict(im, theta):
+	data = imread("./cropped/" + im) / 225.
+	data = reshape(data, 1024)
+	data = np.insert(data, 0, 1)
+	prediction = np.dot(data, theta)
+	return prediction
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=Test]
+theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
+for im in validation_set:
+	prediction = predict(im, theta)
+	if im in actor1_validation_set and norm(prediction) > 0.5:
+		correct_count += 1
+	elif im in actor2_validation_set and norm(prediction) <= 0.5:
+		correct_count += 1
+\end{lstlisting}
+
+In order for the system to work, I had to keep track of each vector/matrix's shape and when to use their transpose in order for the multiplication to work. Also, I had to tune the alpha value and the iteration value. This is because if the alpha value is too small, the gradient descent will be too slow so more iterations are required, and if the alpha value is too large, numpy will give $nan$ on the trained gradients.
+
+\end{homeworkProblem}
+\clearpage
+
 %%----------------------------------------------------------------------------------------
 %%	PROBLEM 4
 %%----------------------------------------------------------------------------------------

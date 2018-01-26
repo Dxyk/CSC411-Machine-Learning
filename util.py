@@ -40,6 +40,7 @@ def print_actor_count():
 
 # ----------- CALCULUS FUNCTIONS -----------
 # ------ binary classifications ------
+# noinspection PyTypeChecker
 def loss(x, y, theta):
     """
     The loss function for binary classification
@@ -81,6 +82,7 @@ def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
     Returns:
         the theta vector after gradient descent
     """
+    print "----------- Starting Gradient Descent -----------"
     eps = 1e-5
     prev_theta = init_theta - 10 * eps
     theta = init_theta.copy()
@@ -90,7 +92,7 @@ def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
     while norm(theta - prev_theta) > eps and i < max_iter:
         prev_theta = theta.copy()
         theta -= alpha * dlossdx(x, y, theta)
-        if i % 5000 == 0 or i == max_iter-1:
+        if i % 5000 == 0 or i == max_iter - 1:
             print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
         i += 1
     return theta
