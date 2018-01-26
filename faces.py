@@ -53,9 +53,51 @@ def divide_sets(actor, path = "./cropped"):
 
 # Part 3
 def classify(actor1 = "baldwin", actor2 = "carell"):
+    """
+    Train and apply a linear classifier on actors 1 and 2
+    Args:
+        actor1 (str): name of the first actor
+        actor2 (str): name of the second actor
+    Returns:
+    """
+    if actor1 not in actor_names or actor2 not in actor_names:
+        print "Error: actor(s) given is not in the data set"
+        raise ValueError
+
+    # get total training set
     actor1_training_set, actor1_validation_set, actor1_test_set = divide_sets(actor1)
     actor2_training_set, actor2_validation_set, actor2_test_set = divide_sets(actor2)
+    training_set = actor1_training_set + actor2_training_set
+    validation_set = actor1_validation_set + actor2_validation_set
+    test_set = actor1_test_set + actor2_test_set
 
+    # initialize input, output and theta
+    x = np.zeros((len(training_set), 1024))
+    y = np.zeros((len(training_set), 1))
+    theta = np.zeros((1025, 1))
+
+    i = 0
+    for image in actor1_training_set:
+        data = imread("./cropped/" + image) / 255.0
+        data = np.reshape(data, 1024)
+        x[i] = data
+        y[i] = 1
+        i += 1
+
+    for image in actor2_training_set:
+        data = imread("./cropped/" + image) / 255.0
+        data = np.reshape(data, 1024)
+        x[i] = data
+        y[i] = 0
+        i += 1
+
+    theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
+
+    # validate on validation set
+
+    # test on test set
+
+    return theta
 
 
 # Part 4
