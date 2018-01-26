@@ -50,9 +50,7 @@ def loss(x, y, theta):
     Returns:
         the loss of the current set of input and data
     """
-    x = x.T
-    x = np.vstack((np.ones((1, x.shape[1])), x))
-    return np.sum((np.dot(x.T, theta) - y) ** 2) / (2.0 * x.shape[1])
+    return np.sum((np.dot(x, theta) - y) ** 2) / (2.0 * x.shape[0])
 
 
 def dlossdx(x, y, theta):
@@ -65,11 +63,9 @@ def dlossdx(x, y, theta):
     Returns:
         the derivative of the loss function
     """
-    x = x.T
-    x = np.vstack((np.ones((1, x.shape[1])), x))
-    y_pred = np.matmul(x.T, theta)
+    y_pred = np.matmul(x, theta)
     error = y_pred - y
-    return np.matmul(x, error) / float(x.shape[1])
+    return np.matmul(x.T, error) / float(x.shape[0])
 
 
 def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
@@ -88,7 +84,7 @@ def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
     eps = 1e-5
     prev_theta = init_theta - 10 * eps
     theta = init_theta.copy()
-    max_iter = 50000
+    max_iter = 100000
     i = 0
 
     while norm(theta - prev_theta) > eps and i < max_iter:

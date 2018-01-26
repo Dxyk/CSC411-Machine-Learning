@@ -14,6 +14,12 @@ import urllib
 
 
 # ----------- HELPER FUNCTIONS -----------
+def predict(im, theta):
+    data = imread("./cropped/" + im) / 225.
+    data = reshape(data, 1024)
+    data = np.insert(data, 0, 1)
+    prediction = np.dot(data, theta)
+    return prediction
 
 
 # ----------- Answers -----------
@@ -56,8 +62,8 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
     """
     Train and apply a linear classifier on actors 1 and 2
     Args:
-        actor1 (str): name of the first actor
-        actor2 (str): name of the second actor
+        actor1 (str): name of the first actor. We label actor1 as 1
+        actor2 (str): name of the second actor. We label actor2 as 0
     Returns:
     """
     if actor1 not in actor_names or actor2 not in actor_names:
@@ -72,7 +78,7 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
     test_set = actor1_test_set + actor2_test_set
 
     # initialize input, output and theta
-    x = np.zeros((len(training_set), 1024))
+    x = np.zeros((len(training_set), 1025))
     y = np.zeros((len(training_set), 1))
     theta = np.zeros((1025, 1))
 
@@ -80,6 +86,7 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
     for image in actor1_training_set:
         data = imread("./cropped/" + image) / 255.0
         data = np.reshape(data, 1024)
+        data = np.insert(data, 0, 1)
         x[i] = data
         y[i] = 1
         i += 1
@@ -87,6 +94,7 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
     for image in actor2_training_set:
         data = imread("./cropped/" + image) / 255.0
         data = np.reshape(data, 1024)
+        data = np.insert(data, 0, 1)
         x[i] = data
         y[i] = 0
         i += 1
@@ -94,10 +102,30 @@ def classify(actor1 = "baldwin", actor2 = "carell"):
     theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
 
     # validate on validation set
+    total = len(validation_set)
+    correct_count = 0
+    for im in validation_set:
+        prediction = predict(im, theta)
+        if im in actor1_validation_set:
+            if norm(prediction) > 0.5:
+                correct_count += 1
+        elif im in actor2_validation_set:
+            if norm(prediction) <= 0.5:
+                correct_count += 1
+    print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
 
     # test on test set
-
-    return theta
+    total = len(test_set)
+    correct_count = 0
+    for im in test_set:
+        prediction = predict(im, theta)
+        if im in actor1_test_set:
+            if norm(prediction) > 0.5:
+                correct_count += 1
+        elif im in actor2_test_set:
+            if norm(prediction) <= 0.5:
+                correct_count += 1
+    print "Result on [Test Set]: {} / {}".format(correct_count, total)
 
 
 # Part 4
