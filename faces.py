@@ -51,12 +51,14 @@ def predict(im, theta):
 
 
 # Part 2
-def divide_sets(actor, path = "./cropped"):
+def divide_sets(actor, training_size = 0, path = "./cropped"):
     """
     Given the downloaded data set and a selected actor, return three randomized list
     of training set, validation set and test set.
     Args:
         actor (str): The selected actor
+        training_size (int): The size of the training set. return the full training
+                             set if set to 0
         path (str): The path to the cropped files
     Returns:
         ([training set], [validation set], [test set])
@@ -76,6 +78,8 @@ def divide_sets(actor, path = "./cropped"):
     test_set = all_actor_image[0: 10]
     validation_set = all_actor_image[10:20]
     training_set = all_actor_image[20:]
+    if training_size != 0:
+        training_set = training_set[:min([training_size, len(training_set)])]
     return training_set, validation_set, test_set
 
 
@@ -100,12 +104,10 @@ def classify(actor1 = "baldwin", actor2 = "carell", training_size = 0,
         raise ValueError
 
     # divide all sets
-    actor1_training_set, actor1_validation_set, actor1_test_set = divide_sets(actor1)
-    actor2_training_set, actor2_validation_set, actor2_test_set = divide_sets(actor2)
-    if training_size != 0 and training_size <= min(actor1_training_set,
-                                                   actor2_training_set):
-        actor1_training_set = actor1_training_set[0: training_size]
-        actor2_training_set = actor2_training_set[0: training_size]
+    actor1_training_set, actor1_validation_set, \
+    actor1_test_set = divide_sets(actor1, training_size)
+    actor2_training_set, actor2_validation_set, \
+    actor2_test_set = divide_sets(actor2, training_size)
 
     training_set = actor1_training_set + actor2_training_set
     validation_set = actor1_validation_set + actor2_validation_set
@@ -204,6 +206,9 @@ def visualize_gradient():
 
 
 # Part 5
+act = ['Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon', 'Alec Baldwin',
+       'Bill Hader', 'Steve Carell']
+
 def overfitting():
     """
     Overfit the data
@@ -211,50 +216,107 @@ def overfitting():
     Returns:
 
     """
-    training_actor_names = [a.split()[1].lower() for a in
-                            ['Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon',
-                             'Alec Baldwin',
-                             'Bill Hader', 'Steve Carell']]
-    act_genders = {'bracco': 0,
-                   'chenoweth': 0,
-                   'drescher': 0,
-                   'ferrera': 0,
-                   'gilpin': 0,
-                   'harmon': 0,
-                   'baldwin': 1,
-                   'butler': 1,
-                   'carell': 1,
-                   'hader': 1,
-                   'radcliffe': 1,
-                   'vartan': 1}
-    test_act_names = [a for a in actor_names if a not in training_actor_names]
-    test_act_genders = {}
-    act_training_set, act_validate_set, act_test_set = dict(), dict(), dict()
-    for a in training_actor_names:
-        act_training_set[a], act_validate_set[a], act_test_set[a] = divide_sets(a)
-    # get all training data
-    training_set = list(itertools.chain.from_iterable(act_training_set.values()))
+    training_sizes = [5, 10, 20, 50, 100, 150]
+    thetas = [np.zeros((1025, 1)) for i in range(6)]
+    training_actor_names = [a.split()[1].lower() for a in act]
+    actor_genders = {'bracco': 0,
+                     'chenoweth': 0,
+                     'drescher': 0,
+                     'ferrera': 0,
+                     'gilpin': 0,
+                     'harmon': 0,
+                     'baldwin': 1,
+                     'butler': 1,
+                     'carell': 1,
+                     'hader': 1,
+                     'radcliffe': 1,
+                     'vartan': 1}
+    # test_actor_names = [a for a in actor_names if a not in training_actor_names]
 
-    x = np.zeros((len(training_set), 1025))
-    y = np.zeros((len(training_set), 1))
-    theta = np.zeros((1025, 1))
+    training_result = dict()
+    validation_result = dict()
 
-    # fill the data with given data set
-    i = 0
-    for a in act_training_set.keys():
-        for image in act_training_set[a]:
-            data = process_image(image)
-            x[i] = data
-            y[i] = 1
-            i += 1
+    for i in range(len(training_sizes)):
+        print "----------- Training on size {} -----------".format(training_sizes[i])
+        actor_training_set, actor_validation_set, \
+        actor_test_set = dict(), dict(), dict()
+
+        for a in training_actor_names:
+            actor_training_set[a], actor_validation_set[a], \
+            actor_test_set[a] = divide_sets(a, training_sizes[i])
+            print "[{}]: {}".format(a, len(actor_training_set[a]))
+
+        # get all training data
+        training_set = list(
+            itertools.chain.from_iterable(actor_training_set.values()))
+        validation_set = list(
+            itertools.chain.from_iterable(actor_validation_set.values()))
+
+        x = np.zeros((len(training_set), 1025))
+        y = np.zeros((len(training_set), 1))
+
+        # fill the data with given data set
+        j = 0
+        for actor in actor_training_set.keys():
+            for image in actor_training_set[actor]:
+                data = process_image(image)
+                x[j] = data
+                y[j] = actor_genders[actor]
+                j += 1
+
+        thetas[i] = grad_descent(loss, dlossdx, x, y, thetas[i], 0.005)
+
+        # test on training set
+        total = sum(
+            [len(actor_training_set[actor]) for actor in actor_training_set.keys()])
+        correct_count = 0
+        for actor in actor_training_set.keys():
+            for im in actor_training_set[actor]:
+                prediction = predict(im, thetas[i])
+                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+                    correct_count += 1
+                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+                    correct_count += 1
+        correct_rate = 100. * correct_count / total
+        training_result[training_sizes[i]] = correct_rate
+
+        print "Result on [Training Set]: {} / {}\n".format(correct_count, total)
+
+        # test on validation set
+        total = sum(
+            [len(actor_validation_set[actor]) for actor in
+             actor_validation_set.keys()])
+        correct_count = 0
+        for actor in actor_validation_set.keys():
+            for im in actor_validation_set[actor]:
+                prediction = predict(im, thetas[i])
+                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+                    correct_count += 1
+                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+                    correct_count += 1
+        correct_rate = 100. * correct_count / total
+        validation_result[training_sizes[i]] = correct_rate
+        print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
+
+    plt.plot(training_sizes, [training_result[size] for size in training_sizes],
+             color = "r", linewidth = 2, marker = "o", label = "Training Set")
+    plt.plot(training_sizes, [validation_result[size] for size in training_sizes],
+             color = "b", linewidth = 2, marker = "o", label = "Validation Set")
+
+    plt.title("Training Set Size VS Performance")
+    plt.xlabel("Training Set Size / images")
+    plt.ylabel("Performance / %")
+    plt.legend()
+    plt.savefig("./Report/images/5/1.jpg")
 
 
 # Part 6
-
+# see faces.pdf for calculations and util.py for implementations
 
 
 # Part 7
-
+def multiclass_classification():
+    training_actor_names = [a.split()[1].lower() for a in act]
 
 
 # Part 8

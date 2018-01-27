@@ -285,395 +285,70 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 \end{homeworkProblem}
 \clearpage
 
-%%----------------------------------------------------------------------------------------
-%%	PROBLEM 4
-%%----------------------------------------------------------------------------------------
-%
-%\begin{homeworkProblem}
-%\noindent \textit{Reconstructing images where salt-and-pepper noise was applied}
-%
-%Noisy images are created using the function \texttt{salt\_and\_pepper\_noise()} (lines 98-106 of \texttt{pca\_example.py}). \\
-%The function \texttt{salt\_and\_pepper\_noise()} randomly sets a subselection of pixels to 0 or 1, while $noise\_prop$ is the proportion of the pixels set to either 0 or 1.
-%Once the salt-and-pepper noise is applied, the images are reconstructed using 200 principal components using the function 
-%\texttt{get\_reconstruction()} (lines 65-70 and 167-317 of \texttt{pca\_example.py}). 
-%
-%We vary the proportion of pixels that are perturbed using salt-and-pepper-noise.
-%
-%Some results are shown in  Figure~\ref{fig:a0all}, Figure~\ref{fig:a2all}, Figure~\ref{fig:a10all}, Figure~\ref{fig:a15all}.
-%
-%For moderate amounts of noise, we are able to get a reconstruction that looks similar to the original image, without the noise.
-%
-%After the proportion of pixels that are perturbed becomes greater than a certain threshold, (the threshold varies from one letter to another), the reconstruction gets worse and worse and eventually stops producing an image that looks like an 'a'.
-%The threshold in Figure~\ref{fig:a0all} and in Figure~\ref{fig:a10all} is around 60\% ($noise\_prop = 0.6$). 
-%That of Figure~\ref{fig:a2all} is around 45\% ($noise\_prop = 0.45$). 
-%Figure~\ref{fig:a15all} has the lowest threshold out of these four examples, at around 20\% ($noise\_prop = 0.2$).
-%
-%\textit{Advice: look at the results, point out where the algorithm works, and where the algorithm doesn't work.}
-%
-%\begin{figure*}[!ht]
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0reconstruction.jpg}
-%  \caption{Original image}
-%  \label{fig:a0}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt05.jpg}
-%  \caption{Image~\ref{fig:a0} with 5\% noise}
-%  \label{fig:a0noise0.05}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt05reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.05} using 200 principal components}
-%  \label{fig:a0noise0.05reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt1.jpg}
-%  \caption{Image~\ref{fig:a0} with 10\% noise}
-%  \label{fig:a0noise0.1}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt1reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.1} using 200 principal components}
-%  \label{fig:a0noise0.1reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt2.jpg}
-%  \caption{Image~\ref{fig:a0} with 20\% noise}
-%  \label{fig:a0noise0.2}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt2reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.2} using 200 principal components}
-%  \label{fig:a0noise0.2reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt3.jpg}
-%  \caption{Image~\ref{fig:a0} with 30\% noise}
-%  \label{fig:a0noise0.3}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt3reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.3} using 200 principal components}
-%  \label{fig:a0noise0.3reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt45.jpg}
-%  \caption{Image~\ref{fig:a0} with 45\% noise}
-%  \label{fig:a0noise0.45}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt45reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.45} using 200 principal components}
-%  \label{fig:a0noise0.45reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt60.jpg}
-%  \caption{Image~\ref{fig:a0} with 60\% noise}
-%  \label{fig:a0noise0.60}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a0noise0pt60reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a0noise0.60} using 200 principal components}
-%  \label{fig:a0noise0.60reconstruction}
-%\end{subfigure}%
-%
-%\caption{}
-%\label{fig:a0all}
-%\end{figure*}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{figure*}[!ht]
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2reconstruction.jpg}
-%  \caption{Original image}
-%  \label{fig:a2}
-%\end{subfigure}%15
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt05.jpg}
-%  \caption{Image~\ref{fig:a2} with 5\% noise}
-%  \label{fig:a2noise0.05}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt05reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.05} using 200 principal components}
-%  \label{fig:a2noise0.05reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt1.jpg}
-%  \caption{Image~\ref{fig:a2} with 10\% noise}
-%  \label{fig:a2noise0.1}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt1reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.1} using 200 principal components}
-%  \label{fig:a2noise0.1reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt2.jpg}
-%  \caption{Image~\ref{fig:a2} with 20\% noise}
-%  \label{fig:a2noise0.2}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt2reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.2} using 200 principal components}
-%  \label{fig:a2noise0.2reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt3.jpg}
-%  \caption{Image~\ref{fig:a2} with 30\% noise}
-%  \label{fig:a2noise0.3}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt3reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.3} using 200 principal components}
-%  \label{fig:a2noise0.3reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt45.jpg}
-%  \caption{Image~\ref{fig:a2} with 45\% noise}
-%  \label{fig:a2noise0.45}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt45reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.45} using 200 principal components}
-%  \label{fig:a2noise0.45reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt60.jpg}
-%  \caption{Image~\ref{fig:a2} with 60\% noise}
-%  \label{fig:a2noise0.60}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a2noise0pt60reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a2noise0.60} using 200 principal components}
-%  \label{fig:a2noise0.60reconstruction}
-%\end{subfigure}%
-%
-%\caption{}
-%\label{fig:a2all}
-%\end{figure*}
-%
-%\begin{figure*}[!ht]
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10reconstruction.jpg}
-%  \caption{Original image}
-%  \label{fig:a10}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt05.jpg}
-%  \caption{Image~\ref{fig:a10} with 5\% noise}
-%  \label{fig:a10noise0.05}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt05reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.05} using 200 principal components}
-%  \label{fig:a10noise0.05reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt1.jpg}
-%  \caption{Image~\ref{fig:a10} with 10\% noise}
-%  \label{fig:a10noise0.1}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt1reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.1} using 200 principal components}
-%  \label{fig:a10noise0.1reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt2.jpg}
-%  \caption{Image~\ref{fig:a10} with 20\% noise}
-%  \label{fig:a10noise0.2}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt2reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.2} using 200 principal components}
-%  \label{fig:a10noise0.2reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt3.jpg}
-%  \caption{Image~\ref{fig:a10} with 30\% noise}
-%  \label{fig:a10noise0.3}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt3reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.3} using 200 principal components}
-%  \label{fig:a10noise0.3reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt45.jpg}
-%  \caption{Image~\ref{fig:a10} with 45\% noise}
-%  \label{fig:a10noise0.45}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt45reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.45} using 200 principal components}
-%  \label{fig:a10noise0.45reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt60.jpg}
-%  \caption{Image~\ref{fig:a10} with 60\% noise}
-%  \label{fig:a10noise0.60}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a10noise0pt60reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a10noise0.60} using 200 principal components}
-%  \label{fig:a10noise0.60reconstruction}
-%\end{subfigure}%
-%
-%\caption{}
-%\label{fig:a10all}
-%\end{figure*}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{figure*}[!ht]
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15reconstruction.jpg}
-%  \caption{Original image}
-%  \label{fig:a15}
-%\end{subfigure}%15
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt05.jpg}
-%  \caption{Image~\ref{fig:a15} with 5\% noise}
-%  \label{fig:a15noise0.05}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt05reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.05} using 200 principal components}
-%  \label{fig:a15noise0.05reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt1.jpg}
-%  \caption{Image~\ref{fig:a15} with 10\% noise}
-%  \label{fig:a15noise0.1}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt1reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.1} using 200 principal components}
-%  \label{fig:a15noise0.1reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt2.jpg}
-%  \caption{Image~\ref{fig:a15} with 20\% noise}
-%  \label{fig:a15noise0.2}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt2reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.2} using 200 principal components}
-%  \label{fig:a15noise0.2reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt3.jpg}
-%  \caption{Image~\ref{fig:a15} with 30\% noise}
-%  \label{fig:a15noise0.3}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt3reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.3} using 200 principal components}
-%  \label{fig:a15noise0.3reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt45.jpg}
-%  \caption{Image~\ref{fig:a15} with 45\% noise}
-%  \label{fig:a15noise0.45}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt45reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.45} using 200 principal components}
-%  \label{fig:a15noise0.45reconstruction}
-%\end{subfigure}%
-%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt60.jpg}
-%  \caption{Image~\ref{fig:a15} with 60\% noise}
-%  \label{fig:a15noise0.60}
-%\end{subfigure}%
-%\begin{subfigure}{.35\textwidth}
-%  \centering
-%  \includegraphics[width=.35\linewidth]{a15noise0pt60reconstruction200PCs.jpg}
-%  \caption{Reconstruction of Image~\ref{fig:a15noise0.60} using 200 principal components}
-%  \label{fig:a15noise0.60reconstruction}
-%\end{subfigure}%
-%
-%\caption{}
-%\label{fig:a15all}
-%\end{figure*}
-%
-%\end{homeworkProblem}
-%\clearpage
-%
 %----------------------------------------------------------------------------------------
+%	PROBLEM 4
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+\noindent \textit{Plotting thetas}
+
+
+
+\end{homeworkProblem}
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 5
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+	\noindent \textit{Overfitting}
+	
+	\begin{figure}[!ht]
+		\includegraphics[width=\linewidth]{images/5/1.jpg}
+		\caption{Overfitting}
+		\label{fig:overfitting}
+	\end{figure}
+
+	The graph above shows that after the training performance reaches the peak, which is around 88\%, the performance for larger training set decreases and this is because at the peak, the set of data best describes the difference between a male's face and a female's face. After this size, the data starts focusing more on each individual's facial features instead of the features for male and female's faces.
+	
+	
+\end{homeworkProblem}
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 6
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+	\noindent \textit{Plotting thetas}
+	
+	
+	
+\end{homeworkProblem}
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 7
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+	\noindent \textit{Plotting thetas}
+	
+	
+	
+\end{homeworkProblem}
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 8
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+	\noindent \textit{Plotting thetas}
+	
+	
+	
+\end{homeworkProblem}
+\clearpage
 \end{document}

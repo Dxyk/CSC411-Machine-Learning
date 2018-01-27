@@ -92,10 +92,49 @@ def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
     while norm(theta - prev_theta) > eps and i < max_iter:
         prev_theta = theta.copy()
         theta -= alpha * dlossdx(x, y, theta)
-        if i % 5000 == 0 or i == max_iter - 1:
-            print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
+        # if i % 5000 == 0 or i == max_iter - 1:
+        #     print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
         i += 1
     return theta
+
+
+# ------ multiclass classifications ------
+def loss_m(x, y, theta):
+    return sum((y - np.dot(x, theta.T)) ** 2)
+
+
+def dlossdx_m(x, y, theta):
+    return 2*(np.dot(x.T, (np.dot(theta, x.T)).T-y)).T
+
+
+def grad_descent(loss_m, dlossdx_m, x, y, init_theta, alpha):
+    """
+    Gradient descent for binary classifier
+    Args:
+        loss (fn): the loss function
+        dlossdx (fn): gradient function
+        x (matrix[float]): input matrix
+        y (vector[float]): target vector
+        init_theta (vector[float]): the initial theta vector
+        alpha (float): learning rate
+    Returns:
+        the theta vector after gradient descent
+    """
+    print "----------- Starting Gradient Descent -----------"
+    eps = 1e-5
+    prev_theta = init_theta - 10 * eps
+    theta = init_theta.copy()
+    max_iter = 100000
+    i = 0
+
+    while norm(theta - prev_theta) > eps and i < max_iter:
+        prev_theta = theta.copy()
+        theta -= alpha * dlossdx(x, y, theta)
+        # if i % 5000 == 0 or i == max_iter - 1:
+        #     print "Iteration: {}\nCost:{}\n".format(i, loss_m(x, y, theta))
+        i += 1
+    return theta
+
 
 # ----------- Initializations -----------
 # Count actors before any operations
