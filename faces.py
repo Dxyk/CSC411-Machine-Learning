@@ -162,7 +162,7 @@ def classify(actor1 = "baldwin", actor2 = "carell", training_size = 0,
         print "----------- Testing -----------"
         total = len(test_set)
         correct_count = 0
-        for im in validation_set:
+        for im in test_set:
             prediction = predict(im, theta)
             if im in actor1_validation_set and norm(prediction) > 0.5:
                 correct_count += 1
@@ -282,17 +282,12 @@ def overfitting():
         total = sum(
             [len(actor_training_set[actor]) for actor in actor_training_set.keys()])
         correct_count = 0
-        # for actor in actor_training_set.keys():
-        #     for im in actor_training_set[actor]:
-        #         prediction = predict(im, thetas[i])
-        #         if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-        #             correct_count += 1
-        #         elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
-        #             correct_count += 1
-        for i in range(len(training_actor_names)):
-            for im in actor_validation_set[training_actor_names[i]]:
+        for actor in actor_training_set.keys():
+            for im in actor_training_set[actor]:
                 prediction = predict(im, thetas[i])
-                if np.argmax(prediction) == i:
+                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+                    correct_count += 1
+                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
                     correct_count += 1
         correct_rate = 100. * correct_count / total
         training_result[training_sizes[i]] = correct_rate
@@ -304,17 +299,12 @@ def overfitting():
             [len(actor_validation_set[actor]) for actor in
              actor_validation_set.keys()])
         correct_count = 0
-        # for actor in actor_validation_set.keys():
-        #     for im in actor_validation_set[actor]:
-        #         prediction = predict(im, thetas[i])
-        #         # if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-        #         #     correct_count += 1
-        #         # elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
-        #         #     correct_count += 1
-        for i in range(len(training_actor_names)):
-            for im in actor_validation_set[training_actor_names[i]]:
+        for actor in actor_validation_set.keys():
+            for im in actor_validation_set[actor]:
                 prediction = predict(im, thetas[i])
-                if np.argmax(prediction) == i:
+                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+                    correct_count += 1
+                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
                     correct_count += 1
         correct_rate = 100. * correct_count / total
         validation_result[training_sizes[i]] = correct_rate
@@ -344,10 +334,6 @@ def multiclass_classification(test_training = True, validate = True):
     for actor in training_actor_names:
         training_set[actor], validation_set[actor], \
             test_set[actor] = divide_sets(actor)
-    # # make all training set equal sizes to fit in matrix
-    # for actor in training_set.keys():
-    #     training_set[actor] = training_set[actor][
-    #                           :min([len(ts) for ts in training_set.values()])]
 
     # get input data
     x = np.zeros((len(list(itertools.chain.from_iterable(training_set.values()))),
@@ -416,26 +402,26 @@ if __name__ == "__main__":
     # part 1
 
     # part 2
-    # actor = "baldwin"
-    # a, b, c = divide_sets(actor)
-    # print "{}\n{}\n{}".format(a, b, c)
+    actor = "baldwin"
+    a, b, c = divide_sets(actor)
+    print "{}\n{}\n{}".format(a, b, c)
 
     # part 3
-    # classify()
+    classify()
 
     # part 4
     # a)
-    # plot_theta()
+    plot_theta()
 
     # b)
 
     # part 5
-    # overfitting()
+    overfitting()
 
     # part 6
 
     # part 7
-    # multiclass_classification()
+    multiclass_classification()
 
     # part 8
     plot_theta_multiclass()
