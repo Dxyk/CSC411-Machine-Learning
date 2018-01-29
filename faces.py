@@ -40,7 +40,7 @@ def predict(im, theta):
         prediction based on the trained theta
     """
     data = process_image(im)
-    prediction = np.dot(data, theta)
+    prediction = np.dot(theta.T, data)
     return prediction
 
 
@@ -139,7 +139,10 @@ def classify(actor1 = "baldwin", actor2 = "carell", training_size = 0,
         i += 1
 
     # use gradient descent to train theta
-    theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
+    if training_size >= 20:
+        theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
+    else:
+        theta = grad_descent(loss, dlossdx, x, y, theta, 0.001)
 
     # validate on validation set
     if validate is True:
@@ -173,7 +176,7 @@ def classify(actor1 = "baldwin", actor2 = "carell", training_size = 0,
 # Part 4
 # TODO: save RGB image
 # a)
-def compare_and_plot_theta(actor1 = "baldwin", actor2 = "carell", compare_size = 2):
+def plot_theta(actor1 = "baldwin", actor2 = "carell", compare_size = 2):
     """
     compare the thetas of different number of training sets
     Args:
@@ -186,17 +189,25 @@ def compare_and_plot_theta(actor1 = "baldwin", actor2 = "carell", compare_size =
     # Note: theta contains a bias term as the first element so drop it
     full_theta = np.delete(full_theta, 0)
     full_theta = np.reshape(full_theta, (32, 32))
-    plt.imsave("./Report/images/4/a_full_theta.jpg", full_theta, cmap = "RdBu")
+    # ret = np.empty((full_theta.shape[0], full_theta.shape[1], 3), dtype=np.uint8)
+    # ret[:, :, 0] = full_theta
+    # ret[:, :, 1] = full_theta
+    # ret[:, :, 2] = full_theta
+    imsave("./Report/images/4/a_full_theta.jpg", full_theta)
+    # plt.imsave("./Report/images/4/a_full_theta.jpg", ret, cmap = "RdBu")
     # toimage(full_theta).save("./Report/images/4/a_full_theta.jpg")
 
     two_theta = classify(actor1, actor2, compare_size, validate = False,
                          test = False)
-    print two_theta.shape
+    # print two_theta.shape
     two_theta = np.delete(two_theta, 0)
     two_theta = np.resize(two_theta, (32, 32))
-    two_theta = np.arange(255)
+    # ret = np.empty((two_theta.shape[0], two_theta.shape[1], 3), dtype=np.uint8)
+    # ret[:, :, 0] = two_theta
+    # ret[:, :, 1] = two_theta
+    # ret[:, :, 2] = two_theta
     imsave("./Report/images/4/a_two_theta.jpg", two_theta)
-    # plt.imsave("./Report/images/4/a_two_theta.jpg", two_theta, cmap = "RdBu")
+    # plt.imsave("./Report/images/4/a_two_theta.jpg", ret, cmap = "RdBu")
     # toimage(two_theta).save("./Report/images/4/a_two_theta.jpg")
 
 
@@ -208,6 +219,7 @@ def visualize_gradient():
 # Part 5
 act = ['Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon', 'Alec Baldwin',
        'Bill Hader', 'Steve Carell']
+
 
 def overfitting():
     """
@@ -270,12 +282,17 @@ def overfitting():
         total = sum(
             [len(actor_training_set[actor]) for actor in actor_training_set.keys()])
         correct_count = 0
-        for actor in actor_training_set.keys():
-            for im in actor_training_set[actor]:
+        # for actor in actor_training_set.keys():
+        #     for im in actor_training_set[actor]:
+        #         prediction = predict(im, thetas[i])
+        #         if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+        #             correct_count += 1
+        #         elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+        #             correct_count += 1
+        for i in range(len(training_actor_names)):
+            for im in actor_validation_set[training_actor_names[i]]:
                 prediction = predict(im, thetas[i])
-                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-                    correct_count += 1
-                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+                if np.argmax(prediction) == i:
                     correct_count += 1
         correct_rate = 100. * correct_count / total
         training_result[training_sizes[i]] = correct_rate
@@ -287,12 +304,17 @@ def overfitting():
             [len(actor_validation_set[actor]) for actor in
              actor_validation_set.keys()])
         correct_count = 0
-        for actor in actor_validation_set.keys():
-            for im in actor_validation_set[actor]:
+        # for actor in actor_validation_set.keys():
+        #     for im in actor_validation_set[actor]:
+        #         prediction = predict(im, thetas[i])
+        #         # if actor_genders[actor] == 1 and norm(prediction) > 0.5:
+        #         #     correct_count += 1
+        #         # elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+        #         #     correct_count += 1
+        for i in range(len(training_actor_names)):
+            for im in actor_validation_set[training_actor_names[i]]:
                 prediction = predict(im, thetas[i])
-                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-                    correct_count += 1
-                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
+                if np.argmax(prediction) == i:
                     correct_count += 1
         correct_rate = 100. * correct_count / total
         validation_result[training_sizes[i]] = correct_rate
@@ -315,30 +337,105 @@ def overfitting():
 
 
 # Part 7
-def multiclass_classification():
+def multiclass_classification(test_training = True, validate = True):
+    # initialize sets
     training_actor_names = [a.split()[1].lower() for a in act]
+    training_set, validation_set, test_set = dict(), dict(), dict()
+    for actor in training_actor_names:
+        training_set[actor], validation_set[actor], \
+            test_set[actor] = divide_sets(actor)
+    # # make all training set equal sizes to fit in matrix
+    # for actor in training_set.keys():
+    #     training_set[actor] = training_set[actor][
+    #                           :min([len(ts) for ts in training_set.values()])]
+
+    # get input data
+    x = np.zeros((len(list(itertools.chain.from_iterable(training_set.values()))),
+                  1025))
+    y = np.zeros((len(list(itertools.chain.from_iterable(training_set.values()))),
+                  len(training_actor_names)))
+
+    k = 0
+    for i in range(len(training_actor_names)):
+        for im in training_set[training_actor_names[i]]:
+            x[k] = process_image(im)
+            y[k][i] = 1
+            k += 1
+
+    # train theta
+    theta = np.zeros((len(training_actor_names), 1025))
+    theta = grad_descent_m(loss_m, dlossdx_m, x, y, theta, 0.0000001).T
+
+    # validate on training set
+    if test_training is True:
+        print "----------- Testing on Training Set -----------"
+        total = len(list(itertools.chain.from_iterable(training_set.values())))
+        correct_count = 0
+        for i in range(len(training_actor_names)):
+            for im in training_set[training_actor_names[i]]:
+                prediction = predict(im, theta)
+                prediction = np.argmax(prediction)
+                if prediction == i:
+                    correct_count += 1
+        print "Result on [Training Set]: {} / {}\n".format(correct_count, total)
+
+    # validate on validation set
+    if validate is True:
+        print "----------- Testing on Validation Set -----------"
+        total = len(list(itertools.chain.from_iterable(validation_set.values())))
+        correct_count = 0
+        for i in range(len(training_actor_names)):
+            for im in validation_set[training_actor_names[i]]:
+                prediction = predict(im, theta)
+                prediction = np.argmax(prediction)
+                if prediction == i:
+                    correct_count += 1
+        print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
+
+    return theta
 
 
 # Part 8
+def plot_theta_multiclass():
+    training_actor_names = [a.split()[1].lower() for a in act]
+    thetas = multiclass_classification(False, False).T
+
+    for i in range(thetas.shape[0]):
+        theta = np.delete(thetas[i], 0)
+        theta = np.reshape(theta, (32, 32))
+        # ret = np.empty((theta.shape[0], theta.shape[1], 3), dtype=np.uint8)
+        # ret[:, :, 0] = theta
+        # ret[:, :, 1] = theta
+        # ret[:, :, 2] = theta
+        imsave("./Report/images/8/{}.jpg".format(training_actor_names[i]), theta)
+        # imsave("./Report/images/8/{}.jpg".format(i), theta, cmap="RdBu")
 
 
 
 if __name__ == "__main__":
-    # part1
+    # part 1
 
-    # part2
+    # part 2
     # actor = "baldwin"
     # a, b, c = divide_sets(actor)
     # print "{}\n{}\n{}".format(a, b, c)
 
-    # part3
+    # part 3
     # classify()
 
-    # part4
+    # part 4
     # a)
-    # compare_and_plot_theta()
+    # plot_theta()
 
     # b)
 
-    # part5
-    overfitting()
+    # part 5
+    # overfitting()
+
+    # part 6
+
+    # part 7
+    # multiclass_classification()
+
+    # part 8
+    plot_theta_multiclass()

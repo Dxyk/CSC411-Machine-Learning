@@ -44,12 +44,6 @@ def print_actor_count():
 def loss(x, y, theta):
     """
     The loss function for binary classification
-    Args:
-        x (matrix[int]: N * k): matrix of input
-        y (vector[int]: 1 * k): vector of target
-        theta (vector[int]: 1 * k): vector of parameters
-    Returns:
-        the loss of the current set of input and data
     """
     return np.sum((np.dot(x, theta) - y) ** 2) / (2.0 * x.shape[0])
 
@@ -57,12 +51,6 @@ def loss(x, y, theta):
 def dlossdx(x, y, theta):
     """
     The derivative of the loss function
-    Args:
-        x (matrix[int]): matrix of input
-        y (vector[int]): vector of target
-        theta (vector[int]): vector of parameters
-    Returns:
-        the derivative of the loss function
     """
     y_pred = np.matmul(x, theta)
     error = y_pred - y
@@ -92,24 +80,30 @@ def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
     while norm(theta - prev_theta) > eps and i < max_iter:
         prev_theta = theta.copy()
         theta -= alpha * dlossdx(x, y, theta)
-        # if i % 5000 == 0 or i == max_iter - 1:
-        #     print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
+        if i % 5000 == 0 or i == max_iter - 1:
+            print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
         i += 1
     return theta
 
 
 # ------ multiclass classifications ------
 def loss_m(x, y, theta):
-    return sum((y - np.dot(x, theta.T)) ** 2)
+    """
+    The loss function for multiclass classification
+    """
+    return sum((np.dot(x, theta.T) - y) ** 2)
 
 
 def dlossdx_m(x, y, theta):
-    return 2*(np.dot(x.T, (np.dot(theta, x.T)).T-y)).T
-
-
-def grad_descent(loss_m, dlossdx_m, x, y, init_theta, alpha):
     """
-    Gradient descent for binary classifier
+    The gradient for the loss function for multiclass classification
+    """
+    return 2*(np.dot(x.T, np.dot(x, theta.T) - y)).T
+
+
+def grad_descent_m(loss_m, dlossdx_m, x, y, init_theta, alpha):
+    """
+    Gradient descent for multiclass classifier
     Args:
         loss (fn): the loss function
         dlossdx (fn): gradient function
@@ -129,9 +123,9 @@ def grad_descent(loss_m, dlossdx_m, x, y, init_theta, alpha):
 
     while norm(theta - prev_theta) > eps and i < max_iter:
         prev_theta = theta.copy()
-        theta -= alpha * dlossdx(x, y, theta)
-        # if i % 5000 == 0 or i == max_iter - 1:
-        #     print "Iteration: {}\nCost:{}\n".format(i, loss_m(x, y, theta))
+        theta -= alpha * dlossdx_m(x, y, theta)
+        if i % 5000 == 0 or i == max_iter - 1:
+            print "Iteration: {}\nCost:{}\n".format(i, loss_m(x, y, theta))
         i += 1
     return theta
 

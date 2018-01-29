@@ -13,7 +13,7 @@
 % to fill the template out. These commands should all be removed when 
 % writing assignment content.
 %
-% This template uses a Perl script as an example snippet of code, most other
+% This template uses j Perl script as an example snippet of code, most other
 % languages are also usable. Configure them in the "CODE INCLUSION 
 % CONFIGURATION" section.
 %
@@ -33,6 +33,9 @@
 \usepackage{subcaption}
 \usepackage{listings} % Required for insertion of code
 \usepackage{courier} % Required for the courier font
+\usepackage{amsmath}
+\usepackage{float}
+
 
 
 % Margins
@@ -63,7 +66,7 @@
 %----------------------------------------------------------------------------------------
 
 \definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
-\lstloadlanguages{Perl} % Load Perl syntax for listings, for a list of other languages supported see: ftp://ftp.tex.ac.uk/tex-archive/macros/latex/contrib/listings/listings.pdf
+\lstloadlanguages{Perl} % Load Perl syntax for listings, for j list of other languages supported see: ftp://ftp.tex.ac.uk/tex-archive/macros/latex/contrib/listings/listings.pdf
 \lstset{language=Perl, % Use Perl in this example
         frame=single, % Single frame around code
         basicstyle=\small\ttfamily, % Use small true type font
@@ -92,7 +95,7 @@
         stepnumber=5 % Line numbers go in steps of 5
 }
 
-% Creates a new command to include a perl script, the first parameter is the filename of the script (without .pl), the second parameter is the caption
+% Creates j new command to include j perl script, the first parameter is the filename of the script (without .pl), the second parameter is the caption
 \newcommand{\perlscript}[2]{
 \begin{itemize}
 \item[]\lstinputlisting[caption=#2,label=#1]{#1.pl}
@@ -104,27 +107,27 @@
 %	Skip this unless you know what you're doing
 %----------------------------------------------------------------------------------------
 
-% Header and footer for when a page split occurs within a problem environment
+% Header and footer for when j page split occurs within j problem environment
 \newcommand{\enterProblemHeader}[1]{
 %\nobreak\extramarks{#1}{#1 continued on next page\ldots}\nobreak
 %\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak
 }
 
-% Header and footer for when a page split occurs between problem environments
+% Header and footer for when j page split occurs between problem environments
 \newcommand{\exitProblemHeader}[1]{
 %\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak
 %\nobreak\extramarks{#1}{}\nobreak
 }
 
 \setcounter{secnumdepth}{0} % Removes default section numbers
-\newcounter{homeworkProblemCounter} % Creates a counter to keep track of the number of problems
+\newcounter{homeworkProblemCounter} % Creates j counter to keep track of the number of problems
 \setcounter{homeworkProblemCounter}{0}
 
 \newcommand{\homeworkProblemName}{}
-\newenvironment{homeworkProblem}[1][Problem \arabic{homeworkProblemCounter}]{ % Makes a new environment called homeworkProblem which takes 1 argument (custom name) but the default is "Problem #"
+\newenvironment{homeworkProblem}[1][Problem \arabic{homeworkProblemCounter}]{ % Makes j new environment called homeworkProblem which takes 1 argument (custom name) but the default is "Problem #"
 \stepcounter{homeworkProblemCounter} % Increase counter for number of problems
 \renewcommand{\homeworkProblemName}{#1} % Assign \homeworkProblemName the name of the problem
-\section{\homeworkProblemName} % Make a section in the document with the custom problem count
+\section{\homeworkProblemName} % Make j section in the document with the custom problem count
 \enterProblemHeader{\homeworkProblemName} % Header and footer within the environment
 }{
 \exitProblemHeader{\homeworkProblemName} % Header and footer after the environment
@@ -137,7 +140,7 @@
 \newcommand{\homeworkSectionName}{}
 \newenvironment{homeworkSection}[1]{ % New environment for sections within homework problems, takes 1 argument - the name of the section
 \renewcommand{\homeworkSectionName}{#1} % Assign \homeworkSectionName to the name of the section from the environment argument
-\subsection{\homeworkSectionName} % Make a subsection with the custom name of the subsection
+\subsection{\homeworkSectionName} % Make j subsection with the custom name of the subsection
 \enterProblemHeader{\homeworkProblemName\ [\homeworkSectionName]} % Header and footer within the environment
 }{
 \enterProblemHeader{\homeworkProblemName} % Header and footer after the environment
@@ -178,7 +181,7 @@
 %	PROBLEM 1
 %----------------------------------------------------------------------------------------
 
-% To have just one problem per page, simply put a \clearpage after each problem
+% To have just one problem per page, simply put j \clearpage after each problem
 
 \begin{homeworkProblem}
 
@@ -231,7 +234,7 @@ The dataset consists of $1691$ gray-scale $32 \times 32$-pixel of images of $12$
 \begin{homeworkProblem}
 \noindent \textit{Separating the sets.}
 
-The algorithm for separating the sets of data is to first shuffle the data as a list, then through list slicing, first pick $10$ images as the test set, then pick $10$ images as the validation set, and finally the rest are used as the training set.
+The algorithm for separating the sets of data is to first shuffle the data as j list, then through list slicing, first pick $10$ images as the test set, then pick $10$ images as the validation set, and finally the rest are used as the training set.
 
 
 \end{homeworkProblem}
@@ -292,6 +295,21 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 \begin{homeworkProblem}
 \noindent \textit{Plotting thetas}
 
+The produced thetas give figures  Figure~\ref{fig:full_dataset} for using a full dataset to train the theta and Figure~\ref{fig:2_images} for using only two images to train the theta:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=30mm]{images/4/a_full_theta.jpg}
+	\caption{Full dataset}
+	\label{fig:full_dataset}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=30mm]{images/4/a_two_theta.jpg}
+	\caption{two data}
+	\label{fig:2_images}
+\end{figure}
 
 
 \end{homeworkProblem}
@@ -310,7 +328,7 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 		\label{fig:overfitting}
 	\end{figure}
 
-	The graph above shows that after the training performance reaches the peak, which is around 88\%, the performance for larger training set decreases and this is because at the peak, the set of data best describes the difference between a male's face and a female's face. After this size, the data starts focusing more on each individual's facial features instead of the features for male and female's faces.
+	The graph above shows that after the training performance reaches the peak, which is around 88\%, the performance for larger training set decreases and this is because at the peak, the set of data best describes the difference between j male's face and j female's face. After this size, the data starts focusing more on each individual's facial features instead of the features for male and female's faces.
 	
 	
 \end{homeworkProblem}
@@ -321,8 +339,104 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 %----------------------------------------------------------------------------------------
 
 \begin{homeworkProblem}
-	\noindent \textit{Plotting thetas}
-	
+	\noindent \textit{Multiclass linear classification}
+	\begin{enumerate}
+		\item 
+		\begin{align*}
+			\theta^ \top x^{(i)} &=
+			\begin{bmatrix}
+			\theta_{11}       & \theta_{12} & \theta_{13} & \dots & \theta_{n1} \\
+			\theta_{21}       & \theta_{22} & \theta_{23} & \dots & \theta_{n2} \\
+			\vdots & \vdots & \vdots & \ddots & \vdots \\
+			\theta_{1k}       & \theta_{2k} & \theta_{3k} & \dots & \theta_{nk}
+			\end{bmatrix}
+			\begin{bmatrix}
+			x^{(i)}_{1} \\
+			x^{(i)}_{2}\\
+			\vdots \\
+			x^{(i)}_{n}
+			\end{bmatrix}\\
+			&=
+			\begin{bmatrix}
+			\sum \limits^{n}_{j = 1} \theta_{j1} x^{(i)}_{j}\\
+			\sum \limits^{n}_{j = 1} \theta_{j2} x^{(i)}_{j}\\
+			\vdots \\
+			\sum \limits^{n}_{j = 1} \theta_{jk} x^{(i)}_{j}
+			\end{bmatrix}
+		\end{align*}
+		Then:
+		\begin{align*}
+		(\theta^ \top x^{(i)} - y^{(i)})^2 &=
+		(\begin{bmatrix}
+		\sum \limits^{n}_{j = 1} \theta_{j1} x^{(i)}_{j}\\
+		\sum \limits^{n}_{j = 1} \theta_{j2} x^{(i)}_{j}\\
+		\vdots \\
+		\sum \limits^{n}_{j = 1} \theta_{jk} x^{(i)}_{j}
+		\end{bmatrix}
+		- 
+		\begin{bmatrix}
+		y^{(i)}_{1} \\
+		y^{(i)}_{2}\\
+		\vdots \\
+		y^{(i)}_{k}
+		\end{bmatrix})^2\\
+		&= 
+		\begin{bmatrix}
+		(\sum \limits^{n}_{j = 1} \theta_{j1} x^{(i)}_{j} - y^{(i)}_{1})^2\\
+		(\sum \limits^{n}_{j = 1} \theta_{j2} x^{(i)}_{j} - y^{(i)}_{2})^2\\
+		\vdots \\
+		(\sum \limits^{n}_{j = 1} \theta_{jk} x^{(i)}_{j} - y^{(i)}_{k})^2
+		\end{bmatrix}
+		\end{align*}
+		
+		Then
+		\begin{align*}
+			\dfrac{\partial J}{\partial \theta_{pq}} = \sum \limits_i 2 (\sum \limits^{n}_{j = 1} \theta_{aq} x^{(i)}_a - y^{(i)}_q) x^{(i)}_p
+		\end{align*}
+		
+		
+		\item 
+		
+		Let $m$ be the number of training examples.
+		
+		$X \text{ is j } n \times m \text{ matrix } \begin{bmatrix}
+			x^{(1)}_1 & \dots & x^{(m)}_1\\
+			x^{(2)}_2 & \dots & x^{(m)}_2\\
+			\vdots & \ddots & \vdots\\
+			x^{(1)}_n & \dots & x^{(m)}_n\\
+		\end{bmatrix}$
+		
+		$Y \text{ is j } k \times m \text{ matrix } \begin{bmatrix}
+		y^{(1)}_1 & \dots & y^{(m)}_1\\
+		y^{(2)}_2 & \dots & y^{(m)}_2\\
+		\vdots & \ddots & \vdots\\
+		y^{(1)}_n & \dots & y^{(m)}_n\\
+		\end{bmatrix}$\\
+		
+		Then $\nabla J(\theta) = 2 X (\theta^\top X - Y)^\top$.
+		
+		Then for each row $q$ for $(\theta^\top X - Y) = \begin{bmatrix}
+		\sum \limits^{n}_{j = 1} \theta_{aq} x^{(1)}_a - y^{(1)}_q & \sum \limits^{n}_{j = 1} \theta_{aq} x^{(2)}_a - y^{(2)}_q & \dots & \sum \limits^{n}_{j = 1} \theta_{aq} x^{(i)}_a - y^{(m)}_q
+		\end{bmatrix}$.
+		
+		Each row $p$ for $X = \begin{bmatrix}
+		X^{(1)}_p & X^{(2)}_p & \dots & X^{(m)}_p
+		\end{bmatrix}$
+		
+		Then the $pq$th entry for $2X(\theta^\top X - Y)^\top$ is $2 \sum \limits^{m}_{i = 1} (\sum \limits^{n}_{j = 1} \theta_{jq} X^{(i)}_j - Y^{(i)}_q) X^{(i)}_p = \dfrac{\partial J}{\partial \theta_{pq}}$
+		
+		\item 
+		Code for cost function and its gradient function in 6.1:
+		\begin{lstlisting}[language=Python, caption=Test]
+		def loss_m(x, y, theta):
+			return sum((np.dot(x, theta.T) - y) ** 2)
+		
+		def dlossdx_m(x, y, theta):
+			return 2*(np.dot(x.T, np.dot(x, theta.T) - y)).T
+		\end{lstlisting}
+		
+
+	\end{enumerate}
 	
 	
 \end{homeworkProblem}
@@ -333,8 +447,10 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 %----------------------------------------------------------------------------------------
 
 \begin{homeworkProblem}
-	\noindent \textit{Plotting thetas}
-	
+	\noindent \textit{Running multiclass linear classification}
+	The performance on Training set is $ 570 / 621 =  91.7\%$ and on Validation set is $ 50 / 60 =  83.3\%$\\
+	$\alpha$ was chosen to be $0.0000001$, which is much smaller than when we trained binary linear classification. This is because when larger alpha is used, the trained theta will contain $nan$.\\
+	The output is obtained by choosing the argmax of the prediction array. This is because the higher the predicted value is, the more confident the algorithm is. Then we compare the index of the chosen label with the correct label, and finally we can see if the prediction is correct or not.
 	
 	
 \end{homeworkProblem}
@@ -347,7 +463,36 @@ In order for the system to work, I had to keep track of each vector/matrix's sha
 \begin{homeworkProblem}
 	\noindent \textit{Plotting thetas}
 	
+	The trained thetas are as follows:
 	
+	\begin{figure*}[!ht]
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/baldwin.jpg}
+			\caption{baldwin}
+		\end{subfigure}
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/bracco.jpg}
+			\caption{bracco}
+		\end{subfigure}%
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/carell.jpg}
+			\caption{carell}
+		\end{subfigure}
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/gilpin.jpg}
+			\caption{gilpin}
+		\end{subfigure}%
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/hader.jpg}
+			\caption{hader}
+		\end{subfigure}
+		\begin{subfigure}{.35\textwidth}
+			\includegraphics[width=.35\linewidth]{images/8/harmon.jpg}
+			\caption{harmon}
+		\end{subfigure}
+		\caption{}
+		\label{fig:pcs}
+	\end{figure*}
 	
 \end{homeworkProblem}
 \clearpage
