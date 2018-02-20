@@ -52,10 +52,13 @@ def generate_set(data, set_type, size = -1):
     else:
         count = 0
         for i in range(10):
-            data_set = data[set_type + str(i)] / 255.0
-            output_set[:, count: count + size // 10] = data_set.T[:, 0: size // 10]
-            soln_set[i, count: count + size // 10] = 1
-            count += size // 10
+            curr_set_type = set_type + str(i)
+            curr_size = size // 10
+            rand_nums = random.sample(range(0, len(data[curr_set_type])), curr_size)
+            data_set = np.array([data[curr_set_type][j, :] / 255.0 for j in rand_nums])
+            output_set[:, count: count + curr_size] = data_set.T
+            soln_set[i, count: count + curr_size] = 1
+            count += curr_size
 
     return output_set, soln_set
 
@@ -73,7 +76,7 @@ def part1():
     # for number in range(10):
     #     for i in range(10):
     #         im = data["train" + str(number)][i].reshape((28, 28)) / 255.0
-    #         file_name = "report/img/1/{}_{}.png".format(str(number), str(i))
+    #         file_name = "report/images/1/{}_{}.png".format(str(number), str(i))
     #         imsave(file_name, im, cmap = cm.gray)
 
     # plot a random sample
@@ -92,27 +95,27 @@ def part1():
             plt.axis('off')
 
     # plt.show()
-    plt.savefig("report/img/1/sample.png")
+    plt.savefig("report/images/1/sample.png")
     plt.close()
     return
 
 
 # Part 2
-def part2(x, W, b):
+def part2(x, W):
     """
     Compute the given network's output.
     The first output layer has linear activation.
     The final output has softmax activation.
     """
-    return linear_forward(x, W, b)
+    return linear_forward(x, W)
 
 
 # Part 3
-def part3(x, W, b, y):
+def part3(x, W, y):
     """
     Compute the network loss function's gradient
     """
-    return dlossdw(x, W, b, y)
+    return dlossdw(x, W, y)
 
 
 # Test Part3
@@ -120,10 +123,10 @@ def test_part3():
     data = loadmat("mnist_all.mat")
 
     x, y = generate_set(data, TRAIN)
-    W = np.random.rand(28 * 28, 10)
-    b = np.ones((10, 1))
+    W = np.random.rand(28 * 28 + 1, 10)
+    x = np.vstack((x, np.ones(x.shape[1])))
 
-    grad = dlossdw(x, W, b, y)
+    grad = part3(x, W, y)
 
     h = 0.000001
     # Taking points in the middle of the image
@@ -131,7 +134,7 @@ def test_part3():
     for point in points:
         W_calc = W.copy()
         W_calc[point, 0] = W[point, 0] + h
-        approx_grad = (loss(x, W_calc, b, y) - loss(x, W, b, y)) / h
+        approx_grad = (loss(x, W_calc, y) - loss(x, W, y)) / h
 
         print "gradient for [{}]: {:.3f}. Difference: " \
               "{:.3f}".format(point, grad[point, 0], approx_grad)
@@ -140,21 +143,93 @@ def test_part3():
 
 
 # Part 4
-def part4(size = 1000):
-    # Load the MNIST digit data
+def part4():
     data = load_data()
-    x, y = generate_set(data, TRAIN, size)
 
-    W = np.zeros((28 * 28 + 1, 10))
-    x = np.vstack((x, np.ones(x.shape[1])))
+    # Hyperparameters
+    size = 1000
+    alpha = 0.00005
+    max_iter = 20000
+    plot = True
+    plot_path = "Report/images/4/gradient_descent.png"
 
-    W = grad_descent(loss, dlossdw, x, y, W, 0.00005, 10000)
+    x_train, y_train = generate_set(data, TRAIN, size)
+    x_test, y_test = generate_set(data, TEST, size)
 
-    np.save("temp/weight.npy", "wb", W)
+    W = np.ones((28 * 28 + 1, 10)) * .5
+    x_train = np.vstack((x_train, np.ones(x_train.shape[1])))
+    x_test = np.vstack((x_test, np.ones(x_test.shape[1])))
 
-    plt.plot(W, x)
+    W = grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, W, alpha = alpha, max_iter = max_iter, plot = plot, plot_path = plot_path)
 
-    return
+    # For testing
+    pickle.dump(W, open("temp/grad_desc.p", "wb"))
+
+    W = pickle.load(open("temp/grad_desc.p", "rb"))
+
+    fig, ax = plt.subplots(5, 2)
+
+    for i in range(len(W.T)):
+        num_weights = W.T[i]
+        num_matrix = num_weights[:-1].reshape((28, 28)) / 255.0
+        plt.sca(ax[i // 2, i % 2])
+        plt.imshow(num_matrix, cmap = cm.gray)
+        plt.axis('off')
+    plt.savefig("report/images/4/weights.png")
+    plt.close()
+
+    # for i in range(len(W.T)):
+    #     num_weights = W.T[i]
+    #     num_matrix = num_weights[:-1].reshape((28, 28)) / 255.0
+    #     mpimg.imsave("Report/images/4/weight{}.png".format(str(i)), num_matrix,
+    #                  cmap=cm.gray)
+
+    return W
+
+
+# Part 5
+def part5():
+    data = load_data()
+
+    # Hyperparameters
+    size = 1000
+    alpha = 0.00005
+    max_iter = 20000
+    plot = True
+    plot_path = "Report/images/4/gradient_descent.png"
+
+    x_train, y_train = generate_set(data, TRAIN, size)
+    x_test, y_test = generate_set(data, TEST, size)
+
+    W = np.ones((28 * 28 + 1, 10)) * .5
+    x_train = np.vstack((x_train, np.ones(x_train.shape[1])))
+    x_test = np.vstack((x_test, np.ones(x_test.shape[1])))
+
+    W = grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, W, alpha = alpha, max_iter = max_iter, plot = plot, plot_path = plot_path)
+
+    # For testing
+    pickle.dump(W, open("temp/grad_desc.p", "wb"))
+
+    W = pickle.load(open("temp/grad_desc.p", "rb"))
+
+    fig, ax = plt.subplots(5, 2)
+
+    for i in range(len(W.T)):
+        num_weights = W.T[i]
+        num_matrix = num_weights[:-1].reshape((28, 28)) / 255.0
+        plt.sca(ax[i // 2, i % 2])
+        plt.imshow(num_matrix, cmap = cm.gray)
+        plt.axis('off')
+    plt.savefig("report/images/4/weights.png")
+    plt.close()
+
+    # for i in range(len(W.T)):
+    #     num_weights = W.T[i]
+    #     num_matrix = num_weights[:-1].reshape((28, 28)) / 255.0
+    #     mpimg.imsave("Report/images/4/weight{}.png".format(str(i)), num_matrix,
+    #                  cmap=cm.gray)
+
+    return W
 
 
 if __name__ == "__main__":
