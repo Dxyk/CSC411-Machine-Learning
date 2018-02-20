@@ -132,7 +132,7 @@
 	
 	\begin{figure}[!ht]
 		\centering
-		\includegraphics[width=.8\linewidth]{img/1/sample.png}
+		\includegraphics[width=.8\linewidth]{images/1/sample.png}
 		\caption{Full data}
 		\label{fig:sample}
 	\end{figure}
@@ -140,19 +140,19 @@
 	\begin{figure*}[!ht]
 		\begin{subfigure}{.33\textwidth}
 			\centering
-			\includegraphics[width=.35\linewidth]{img/1/5_0.png}
+			\includegraphics[width=.35\linewidth]{images/1/5_0.png}
 			\caption{$5$ but looks like a $3$}
 			\label{fig:incorrect1}
 		\end{subfigure}
 		\begin{subfigure}{.33\textwidth}
 			\centering
-			\includegraphics[width=.35\linewidth]{img/1/6_4.png}
+			\includegraphics[width=.35\linewidth]{images/1/6_4.png}
 			\caption{$6$ but looks like a $4$}
 			\label{fig:incorrect2}
 		\end{subfigure}
 		\begin{subfigure}{.33\textwidth}
 			\centering
-			\includegraphics[width=.35\linewidth]{img/1/9_9.png}
+			\includegraphics[width=.35\linewidth]{images/1/9_9.png}
 			\caption{$9$ but looks like an $8$}
 			\label{fig:Incorrect3}
 		\end{subfigure}
@@ -173,8 +173,8 @@
 		\end{align*}
 		The listing of the implementation is as follows:\\
 		\begin{lstlisting}[language=python, caption=code for linear net output]
-	def linear_forward(x, W, b):
-		lin_output = np.dot(W.T, x) + b
+	def linear_forward(x, W):
+		lin_output = np.dot(W.T, x)
 		return softmax(lin_output)
 		\end{lstlisting}
 
@@ -241,16 +241,16 @@
 		\item
 		The vectorized implementation is as follows:
 		\begin{lstlisting}[language=Python, caption=Vectorized gradient]
-	def linear_forward(x, W, b):
-		lin_output = np.dot(W.T, x) + b
+	def linear_forward(x, W):
+		lin_output = np.dot(W.T, x)
 		return softmax(lin_output)
 	
-	def loss(x, W, y, b):
-		p = linear_forward(x, W, b)
+	def loss(x, W, y):
+		p = linear_forward(x, W)
 		return -np.sum(y * np.log(p)) / x.shape[1]
 	
-	def dlossdw(x, W, y, b):
-		p = linear_forward(x, W, b)
+	def dlossdw(x, W, y):
+		p = linear_forward(x, W)
 		return np.matmul((p - y), x.T).T
 		\end{lstlisting}
 		

@@ -3,13 +3,61 @@ from scipy.io import loadmat
 from pylab import *
 import random
 import numpy as np
-import matplotlib.image as mpimg
+import pickle
 import matplotlib.pyplot as plt
+
+
+# ==================== CONSTANTS ====================
+TRAIN = "train"
+TEST = "test"
 
 
 # ==================== HELPER FUNCTIONS ====================
 def load_data():
     return loadmat("mnist_all.mat")
+
+
+def generate_set(data, set_type, size = -1):
+    """
+    generate the training set from data
+    :param data: the given data
+    :set_type data: dict
+    :param set_type: "train" or "test"
+    :set_type set_type: str
+    :param size: the size of set
+    :set_type size: int
+    :return: the training set and the corresponding answer
+    :rtype: tuple (list, list)
+    """
+    if set_type not in [TEST, TRAIN]:
+        print "generate_set: Invalid set_type"
+        return None
+
+    if size == -1:
+        arr_size = sum([data[set_type + str(i)].shape[0] for i in range(10)])
+    else:
+        arr_size = min(sum([data[set_type + str(i)].shape[0] for i in range(10)]),
+                       size)
+
+    output_set = np.zeros((28 * 28, arr_size,))
+    soln_set = np.zeros((10, arr_size))
+
+    if size == -1:
+        count = 0
+        for i in range(10):
+            data_set = data[set_type + str(i)] / 255.0
+            output_set[:, count: count + data_set.shape[0]] = data_set.T
+            soln_set[i, count: count + data_set.shape[0]] = 1
+            count += data_set.shape[0]
+    else:
+        count = 0
+        for i in range(10):
+            data_set = data[set_type + str(i)] / 255.0
+            output_set[:, count: count + size // 10] = data_set.T[:, 0: size // 10]
+            soln_set[i, count: count + size // 10] = 1
+            count += size // 10
+
+    return output_set, soln_set
 
 
 # ==================== MAIN FUNCTIONS ====================
@@ -71,21 +119,9 @@ def part3(x, W, b, y):
 def test_part3():
     data = loadmat("mnist_all.mat")
 
-    n = 28 * 28
-    k = 10
-    num = sum([data["train" + str(i)].shape[0] for i in range(10)])
-
-    x = np.zeros((n, num))
-    W = np.random.rand(n, k)
-    b = np.ones((k, 1))
-    y = np.zeros((k, num))
-
-    count = 0
-    for i in range(10):
-        data_set = data["train" + str(i)] / 255.0
-        x[:, count: count + data_set.shape[0]] = data_set.T
-        y[i, count: count + data_set.shape[0]] = 1
-        count += data_set.shape[0]
+    x, y = generate_set(data, TRAIN)
+    W = np.random.rand(28 * 28, 10)
+    b = np.ones((10, 1))
 
     grad = dlossdw(x, W, b, y)
 
@@ -97,15 +133,27 @@ def test_part3():
         W_calc[point, 0] = W[point, 0] + h
         approx_grad = (loss(x, W_calc, b, y) - loss(x, W, b, y)) / h
 
-        print "gradient for [{}]: {:.3f}. Difference: {:.3f}".format(point, grad[point, 0], approx_grad)
+        print "gradient for [{}]: {:.3f}. Difference: " \
+              "{:.3f}".format(point, grad[point, 0], approx_grad)
 
     return
 
 
 # Part 4
-def part4():
+def part4(size = 1000):
     # Load the MNIST digit data
-    data = loadmat("mnist_all.mat")
+    data = load_data()
+    x, y = generate_set(data, TRAIN, size)
+
+    W = np.zeros((28 * 28 + 1, 10))
+    x = np.vstack((x, np.ones(x.shape[1])))
+
+    W = grad_descent(loss, dlossdw, x, y, W, 0.00005, 10000)
+
+    np.save("temp/weight.npy", "wb", W)
+
+    plt.plot(W, x)
+
     return
 
 
@@ -114,4 +162,5 @@ if __name__ == "__main__":
     # part1()
     # part2()
     # part3()
-    test_part3()
+    # test_part3()
+    part4()

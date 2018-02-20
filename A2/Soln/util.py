@@ -42,55 +42,47 @@ def deriv_multilayer(W0, b0, W1, b1, x, L0, L1, y, y_):
     dCdW1 = np.dot(L0, dCdL1.T)
 
 
-def linear_forward(x, W, b):
+def linear_forward(x, W):
     """
     Compute the given network's output.
     The first output layer has linear activation.
     The final output has softmax activation.
     """
-    lin_output = np.dot(W.T, x) + b
+    lin_output = np.dot(W.T, x)
     return softmax(lin_output)
 
 
-def loss(x, W, b, y):
+def loss(x, W, y):
     """
     The cost function for linear forward
     """
-    p = linear_forward(x, W, b)
+    p = linear_forward(x, W)
     return -np.sum(y * np.log(p)) / x.shape[1]
 
 
-def dlossdw(x, W, b, y):
+def dlossdw(x, W, y):
     """
     The gradient for linear forward cost w.r.t weight w
     """
-    p = linear_forward(x, W, b)
-    return np.matmul((p - y), x.T).T
+    p = linear_forward(x, W)
+    return np.dot((p - y), x.T).T
 
 
-def dlossdb(x, W, b, y):
-    """
-    The gradient for linear forward cost w.r.t weight b
-    """
-    p = linear_forward(x, W, b)
-    return np.matmul((p - y), x.T).T
-
-
-def grad_descent(loss, dlossdx, x, y, init_theta, alpha):
+def grad_descent(loss, dlossdw, x, y, init_W, alpha = 0.00001, max_iter = 10000):
     """
     Gradient descent for linear forward
     """
     print "----------- Starting Gradient Descent -----------"
     eps = 1e-5
-    prev_theta = init_theta - 10 * eps
-    theta = init_theta.copy()
-    max_iter = 100000
+    prev_W = init_W - 10 * eps
+    W = init_W.copy()
     i = 0
 
-    while norm(theta - prev_theta) > eps and i < max_iter:
-        prev_theta = theta.copy()
-        theta -= alpha * dlossdx(x, y, theta)
-        if i % 5000 == 0 or i == max_iter - 1:
-            print "Iteration: {}\nCost:{}\n".format(i, loss(x, y, theta))
+    while i < max_iter and norm(W - prev_W) > eps:
+        prev_W = W.copy()
+        W -= alpha * dlossdw(x, W, y)
+        if i % (max_iter // 10) == 0 or i == max_iter - 1:
+            print "Iteration: {}\n\tCost:{}\n".format(i, loss(x, W, y))
         i += 1
-    return theta
+    print "----------- Done Gradient Descent -----------"
+    return W
