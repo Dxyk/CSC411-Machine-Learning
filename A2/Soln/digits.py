@@ -196,7 +196,7 @@ def part5():
     alpha = 0.00005
     max_iter = 20000
     plot = True
-    plot_path = "Report/images/4/gradient_descent.png"
+    plot_path = "Report/images/5/gradient_descent.png"
 
     x_train, y_train = generate_set(data, TRAIN, size)
     x_test, y_test = generate_set(data, TEST, size)
