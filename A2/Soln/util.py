@@ -122,7 +122,7 @@ def grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, init_W,
     print "----------- Done Gradient Descent -----------"
 
     if plot:
-        plt.plot(iterations, train_results, 'b', iterations, test_results, 't')
+        plt.plot(iterations, train_results, 'b', iterations, test_results, 'r')
         plt.xlabel("iterations")
         plt.ylabel("accuracy")
         if plot_path == "":

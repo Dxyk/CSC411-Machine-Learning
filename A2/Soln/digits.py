@@ -164,9 +164,9 @@ def part4():
     W = grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, W, alpha = alpha, max_iter = max_iter, plot = plot, plot_path = plot_path)
 
     # For testing
-    pickle.dump(W, open("temp/grad_desc.p", "wb"))
+    pickle.dump(W, open("temp/4/weight.p", "wb"))
 
-    W = pickle.load(open("temp/grad_desc.p", "rb"))
+    W = pickle.load(open("temp/4/weight.p", "rb"))
 
     fig, ax = plt.subplots(5, 2)
 
@@ -210,9 +210,9 @@ def part5():
     W = grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, W, alpha = alpha, gamma = gamma, max_iter = max_iter, plot = plot, plot_path = plot_path)
 
     # For testing
-    pickle.dump(W, open("temp/grad_desc.p", "wb"))
+    pickle.dump(W, open("temp/5/weight.p", "wb"))
 
-    W = pickle.load(open("temp/grad_desc.p", "rb"))
+    W = pickle.load(open("temp/5/weight.p", "rb"))
 
     fig, ax = plt.subplots(5, 2)
 
@@ -234,6 +234,37 @@ def part5():
     return W
 
 
+# Part 6
+def part6a():
+    """
+    We pick w1 to be [13, 13] (13 * 28 + 13 = 377) and
+    w2 to be [14, 14] (14 * 28 + 14 = 406)
+    """
+    data = load_data()
+    W = pickle.load(open("temp/5/weight.p", 'rb')) #load weights
+
+    print W.shape
+    w1 = 337
+    w2 = 406
+
+    # x_train, y_train = generate_set(data, TRAIN, 1000)
+    # b = np.ones(shape = (10, 1))
+    #
+    # X1 = np.linspace(-1, 1, 100)
+    # X2 = np.linsapce(-1, 1, 100)
+    #
+    # res_a = np.zeros(shape = (100,100))
+    # max_deviation = 1
+    # for i in range(100):
+    #     for j in range(100):
+    #         W[w1, 5] += X1[i] * max_deviation
+    #         W[w2, 5] += X2[j] * max_deviation
+    #         res_a[i+50, j+50] = loss(x_train, W, y_train)
+    #
+    # return X1, X2, res_a
+    return
+
+
 if __name__ == "__main__":
     np.random.seed(0)
     # part1()
@@ -241,4 +272,5 @@ if __name__ == "__main__":
     # part3()
     # test_part3()
     # part4()
-    part5()
+    # part5()
+    part6a()
