@@ -321,18 +321,30 @@
 	
 	\begin{enumerate}
 		\item 
+		The contour plot is given in Fig \ref{fig:6.1}
 		
-		\clearpage
 		\item 
+		The trajectory for "vanilla" gradient descent is the yellow line in the plot
+
+		\item 
+		The trajectory for momentum gradient descent is the green line in the plot
+
+		\item 
+		The "vanilla" gradient descent has more fluctuations due to the large learning rate. However, with momentum pointing to the constant optimum direction, the trajectory for momentum has less fluctuations. Also, to achieve the same learning effect (how close to the optimum), momentum gradient descent needs less steps.
 		
-		\clearpage
 		\item 
+		The points were selected to be around the middle of the image. This is because that is where the weights matter the most. If the points were selected to be at the edge of the image, the weights won't matter because the edge does not contain anything that determines what the digit is.
 		
-		\clearpage
-		\item 
+		To produce a good visualization, the learning rate for both gradient descent must be tuned to be higher than normal, and the learning rate for "vanilla" gradient descent must be much higher to produce the fluctuation.
 		
-		\clearpage
-		\item 
+		A set of weights that won't produce a good visualization is chosen to be at the corner of the graph. The trajectories are not moving at all no matter how we change the initial values.
+		
+		\begin{figure}[!ht]
+			\centering
+			\includegraphics[width=.5\linewidth]{images/6/a.png}
+			\caption{part (a-c)}
+			\label{fig:6.1}
+		\end{figure}
 		
 	\end{enumerate}
 

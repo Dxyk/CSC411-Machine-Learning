@@ -74,6 +74,16 @@ def loss(x, W, y):
     The cost function for linear forward
     """
     p = linear_forward(x, W)
+    # try:
+    #     np.sum(y * np.log(p)) / x.shape[1]
+    # except FloatingPointError, e:
+    #     import time
+    #     print "============================="
+    #     print "X: \n", x
+    #     print "W: \n", W
+    #     print "Y: \n", y
+    #     print "============================="
+    #     time.sleep(1)
     return -np.sum(y * np.log(p)) / x.shape[1]
 
 
@@ -85,17 +95,19 @@ def dlossdw(x, W, y):
     return np.dot((p - y), x.T).T
 
 
-def grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, init_W,
-                 alpha = 0.00001, gamma = 0, max_iter = 10000, plot = False, plot_path = ""):
+def grad_descent(loss, dlossdw, x_train, y_train, x_val, y_val, x_test, y_test,
+                 init_W, alpha = 0.00001, gamma = 0, max_iter = 10000,
+                 plot_path = ""):
     """
     Gradient descent for linear forward
     """
     iterations = []
     train_results = []
+    val_results = []
     test_results = []
 
     print "----------- Starting Gradient Descent -----------"
-    eps = 1e-5
+    eps = 1e-4
     prev_W = init_W - 10 * eps
     W = init_W.copy()
     i = 0
@@ -109,26 +121,64 @@ def grad_descent(loss, dlossdw, x_train, y_train, x_test, y_test, init_W,
 
         if i % 10 == 0 or i == max_iter - 1:
             train_result = get_accuracy(x_train, W, y_train)
+            val_result = get_accuracy(x_val, W, y_val)
             test_result = get_accuracy(x_test, W, y_test)
             train_results.append(train_result)
+            val_results.append(val_result)
             test_results.append(test_result)
             iterations.append(i)
-            if i % (max_iter // 100) == 0 or i == max_iter - 1:
+            if i % (max_iter // 10) == 0 or i == max_iter - 1:
                 print "Iteration: {}".format(i)
-                print "\tTrain Cost:{}".format(loss(x_train, W, y_train))
-                print "\tTest Cost:{}".format(loss(x_test, W, y_test))
+                print "\tTrain Loss:{}".format(loss(x_train, W, y_train))
+                print "\tValidation Loss:{}".format(loss(x_val, W, y_val))
+                print "\tTest Loss:{}".format(loss(x_test, W, y_test))
+                print "\tTrain rate:{}".format(get_accuracy(x_train, W, y_train))
+                print "\tValidation rate:{}".format(get_accuracy(x_val, W, y_val))
+                print "\tTest rate:{}".format(get_accuracy(x_test, W, y_test))
 
         i += 1
     print "----------- Done Gradient Descent -----------"
 
-    if plot:
-        plt.plot(iterations, train_results, 'b', iterations, test_results, 'r')
+    if plot_path != "":
+        plt.plot(iterations, train_results, 'b', iterations, val_results, 'g',
+                 iterations, test_results, 'r')
         plt.xlabel("iterations")
         plt.ylabel("accuracy")
-        if plot_path == "":
-            print "Please provide a plot path"
-            print "Showing instead"
-            plt.show()
+        plt.legend(("Training", "Validation", "Test"), loc = "best")
+        plt.title("Learning curve")
         plt.savefig(plot_path)
 
     return W
+
+
+def grad_descent_6(loss, dlossdw, x_train, y_train, x_val, y_val, x_test, y_test,
+                 init_W, w1, w2, alpha = 0.00001, gamma = 0, max_iter = 10000):
+    print "----------- Starting Gradient Descent -----------"
+    eps = 1e-4
+    prev_W = init_W - 10 * eps
+    W = init_W.copy()
+    i = 0
+    V = np.zeros(W.shape)
+    rec = [(W[w1, 5], W[w2, 5])]
+
+    while i < max_iter and norm(W - prev_W) > eps:
+        prev_W = W.copy()
+        # W -= alpha * dlossdw(x_train, W, y_train)
+        V = gamma * V + alpha * dlossdw(x_train, W, y_train)
+        W[w1, 5] -= V[w1, 5]
+        W[w2, 5] -= V[w2, 5]
+        rec.append((W[w1, 5], W[w2, 5]))
+
+        if i % (max_iter // 10) == 0 or i == max_iter - 1:
+            print "Iteration: {}".format(i)
+            print "\tTrain Loss:{}".format(loss(x_train, W, y_train))
+            print "\tValidation Loss:{}".format(loss(x_val, W, y_val))
+            print "\tTest Loss:{}".format(loss(x_test, W, y_test))
+            print "\tTrain rate:{}".format(get_accuracy(x_train, W, y_train))
+            print "\tValidation rate:{}".format(get_accuracy(x_val, W, y_val))
+            print "\tTest rate:{}".format(get_accuracy(x_test, W, y_test))
+
+        i += 1
+    print "----------- Done Gradient Descent -----------"
+
+    return W, rec
