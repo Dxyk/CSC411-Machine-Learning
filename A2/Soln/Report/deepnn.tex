@@ -97,8 +97,8 @@
 
 \newcommand{\hmwkTitle}{Assignment\ \#2} % Assignment title
 \newcommand{\hmwkClass}{CSC 411} % Course/class
-\newcommand{\hmwkAuthorName}{Xiangyu Kong} % Your name
-\newcommand{\hmwkUTorId}{kongxi16} % UTorID
+\newcommand{\hmwkAuthorName}{Xiangyu Kong \hspace{3em} Yun Lu} % Your name
+\newcommand{\hmwkUTorId}{kongxi16 \hspace{5em} luyun5} % UTorID
 
 %------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -355,7 +355,7 @@
 	%	PROBLEM 7
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
+		
 
 
 	\end{homeworkProblem}
@@ -365,17 +365,64 @@
 	%	PROBLEM 8
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
+		The final test result for resolution of $32 \times 32$ has an accuracy of $83.3\%$ and for resolution of $64 \times 64$ has an accuracy of $80\%$. The learning curves of the two resolutions are shown in Fig \ref{fig:8.1}.
+		
+		The results are trained by  a fully connected, three-layered (input, hidden, output) network. The weights and bias are randomized. The activation function for input and output layer is linear, and for the hidden layer is ReLU. The network uses Adam as its optimizer. The hyper-parameters are picked through repeated experiments. The final hyper-parameters are: alpha = 0.001, number of hidden neurons = 36, epoch = 5, number of mini-batch in each epoch = 5, and the number of iterations = 1000
+		
+		\begin{figure}[!ht]
+			\begin{subfigure}{.45\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/8/a.png}
+				\caption{$32 \times 32$}
+				\label{fig:8.1a}
+			\end{subfigure}
+			\begin{subfigure}{.45\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/8/b.png}
+				\caption{$64 \times 64$}
+				\label{fig:8.1b}
+			\end{subfigure}
+		\centering
+		\caption{learning curves}
+		\label{fig:8.1}
+		\end{figure}
 
 
 	\end{homeworkProblem}
 	\clearpage
 
-	%----------------------------------------------------------------------------------
+	%---------------------------------------------------------------------------------
 	%	PROBLEM 9
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
+		The actors are chosen to be Harmon and Hader. Their hidden units are visualized as in Fig \ref{fig:9}.
+		
+		The weight units are chosen using the following snippet of code: 
+		\begin{lstlisting}[language=Python, caption={Code for choosing featuring weight unit}]
+	x = Variable(torch.from_numpy(W), 
+		requires_grad=False).type(dtype_float)
+	y = model(x).data.numpy()
+	for k in range(y.shape[0]):
+	print k, actor_names[np.argmax(y[k, :])]
+		\end{lstlisting}
+		
+		\begin{figure}[!ht]
+			\begin{subfigure}{.4\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/9/0.png}
+				\caption{Actor1: Harmon}
+				\label{fig:9.1}
+			\end{subfigure}
+			\begin{subfigure}{.4\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/9/2.png}
+				\caption{Actor2: Hader}
+				\label{fig:9.2}
+			\end{subfigure}
+			\centering
+			\caption{Weight Visualizations}
+			\label{fig:9}
+		\end{figure}
 
 
 	\end{homeworkProblem}

@@ -1,12 +1,46 @@
 from pylab import *
 import matplotlib.pyplot as plt
+import os
 import matplotlib.image as mpimg
 from scipy.io import loadmat
 import numpy as np
 import pickle
 
+# ========== CONSTANTS ==========
+BUFF_SIZE = 65536
+ACTORS_FILE = "Resource/subset_actors.txt"
+UNCROPPED = "Resource/uncropped/"
+CROPPED32 = "Resource/cropped_32/"
+CROPPED64 = "Resource/cropped_64/"
+
+
+# ----------- GLOBAL VARIABLES -----------
+# list of actors
+actors = ["Lorraine Bracco", "Peri Gilpin", "Angie Harmon", "Alec Baldwin",
+          "Bill Hader", "Steve Carell"]
+# list of actors with their lower case last name
+actor_names = [actor.split()[1] for actor in sorted(actors)]
+# a dict of actor : count
+actor_count = {actor_name: 0 for actor_name in actor_names}
+
 
 # ========== HELPER FUNCTIONS ==========
+def count_actors(path = "./Resource/uncropped"):
+    """
+    Count all actor's images
+    Args:
+        path (str): the path to the data set
+    Returns:
+        A dict of actor if actor is not given
+    """
+    for root, dirs, images in os.walk(path):
+        for image in images:
+            for actor_name in actor_names:
+                if image.find(actor_name) != -1:
+                    actor_count[actor_name] += 1
+    return actor_count
+
+
 def get_accuracy(x, W, y):
     p = linear_forward(x, W)
 
@@ -182,3 +216,5 @@ def grad_descent_6(loss, dlossdw, x_train, y_train, x_val, y_val, x_test, y_test
     print "----------- Done Gradient Descent -----------"
 
     return W, rec
+
+count_actors()
