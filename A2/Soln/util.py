@@ -19,7 +19,7 @@ CROPPED64 = "Resource/cropped_64/"
 actors = ["Lorraine Bracco", "Peri Gilpin", "Angie Harmon", "Alec Baldwin",
           "Bill Hader", "Steve Carell"]
 # list of actors with their lower case last name
-actor_names = [actor.split()[1] for actor in sorted(actors)]
+actor_names = [actor.split()[1].lower() for actor in sorted(actors)]
 # a dict of actor : count
 actor_count = {actor_name: 0 for actor_name in actor_names}
 

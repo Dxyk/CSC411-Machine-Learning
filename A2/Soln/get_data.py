@@ -82,7 +82,7 @@ def print_actor_count():
         print "{} : {}".format(actor, count)
 
 
-def crop_image(actor_info, uncropped_path, cropped_path, resolution = 32):
+def crop_image(actor_info, uncropped_path, cropped_path, gray = True, resolution = 32):
     """
     Crop, grayscale and resize the downloaded image, and save.
     If the image could not be processed, delete it.
@@ -97,24 +97,23 @@ def crop_image(actor_info, uncropped_path, cropped_path, resolution = 32):
     :return: True if the image is successfully processed
     :rtype: bool
     """
-    if resolution not in [32, 64]:
-        raise ValueError("Resolution not supported")
     coords = actor_info[5]
     try:
         x1, y1, x2, y2 = map(int, coords.split(','))
         im = imread(uncropped_path)
-        gray_im = rgb2gray(im)
-        cropped_im = gray_im[y1:y2, x1: x2]
+        if gray:
+            im = rgb2gray(im)
+        cropped_im = im[y1:y2, x1: x2]
         resized_cropped_im = imresize(cropped_im, (resolution, resolution))
         imsave(cropped_path, resized_cropped_im)
         return True
 
     except Exception, e:
         print e
-        if os.path.isfile(uncropped_path):
-            os.remove(uncropped_path)
-        if os.path.isfile(cropped_path):
-            os.remove(cropped_path)
+        # if os.path.isfile(uncropped_path):
+        #     os.remove(uncropped_path)
+        # if os.path.isfile(cropped_path):
+        #     os.remove(cropped_path)
         return False
 
 
@@ -140,11 +139,13 @@ def get_actor_data(actor):
         target_sha256 = actor_info[6]
 
         # check if line is about target actor
-        if actor.split()[0] == first_name and actor.split()[1] == last_name:
-            file_name = "{0}{1}.{2}".format(last_name, str(i), url.split('.')[-1])
+        if actor.split()[0].lower() == first_name.lower() and \
+                        actor.split()[1].lower() == last_name.lower():
+            file_name = "{0}{1}.{2}".format(last_name.lower(), str(i), url.split('.')[-1])
             uncropped_path = UNCROPPED + file_name
             cropped32_path = CROPPED32 + file_name
             cropped64_path = CROPPED64 + file_name
+            cropped227_path = "Resource/cropped_227/" + file_name
 
             # download file
             timeout(testfile.retrieve, (url, uncropped_path), {}, 30)
@@ -160,8 +161,9 @@ def get_actor_data(actor):
                     os.remove(uncropped_path)
                 continue
 
-            if crop_image(actor_info, uncropped_path, cropped32_path, 32) and\
-                    crop_image(actor_info, uncropped_path, cropped64_path, 64):
+            if crop_image(actor_info, uncropped_path, cropped32_path, True, 32) and \
+                    crop_image(actor_info, uncropped_path, cropped64_path, True, 64) and \
+                    crop_image(actor_info, uncropped_path, cropped227_path, False, 227):
                 print file_name + " OK"
                 i += 1
             else:
@@ -179,5 +181,5 @@ def get_data():
 
 
 if __name__ == "__main__":
-    # get_data()
-    print_actor_count()
+    get_data()
+    # print_actor_count()

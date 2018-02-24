@@ -1,227 +1,228 @@
-from util import *
 import torch
-from torch.autograd import *
+import torchvision.models as models
+import torchvision
+from torch.autograd import Variable
+import numpy as np
+import  matplotlib.pyplot as plt
+from scipy.misc import imread, imresize
+import torch.nn as nn
+import os
+from util import *
 
-
-# ----------- CONSTANTS -----------
-# We denote male as 1 and female as 0
-actor_genders = {'Bracco': 0,
-                 'Gilpin': 0,
-                 'Harmon': 0,
-                 'Baldwin': 1,
-                 'Hader': 1,
-                 'Carell': 1}
+# ========== CONSTANTS ==========
 dtype_float = torch.FloatTensor
 dtype_long = torch.LongTensor
 
 
-# ----------- HELPER FUNCTIONS -----------
-def process_image(im, resolution = 32):
-    """
-    Process the given image and output the data
-    Args:
-        im (str): path to the image
-    Returns:
-        the processed data
-    """
-    if resolution == 32:
-        path = CROPPED32
-    else:
-        path = CROPPED64
-    data = imread(path + im).flatten() / 225.
-    data = data.reshape(resolution * resolution)
-    # data = np.insert(data, 0, 1)
-    return data.T
+def generate_sets(actor):
+    '''Return two lists of randomized image names
+    in cropped/ folder that match actor name
+
+    Training Set - At least 67 image names (Screw Peri Gilpin)
+    Validation Set - 10 image names
+    Testing Set - 10 image names
+
+    Takes in name as lowercase last name (ex: gilpin)
+    Assumption: cropped/ folder is populated with images from get_and_crop_images
+    '''
+    image_list = [f_name for f_name in os.listdir("./Resource/cropped_227/")
+                  if actor in f_name]
+
+    np.random.seed(0)
+    np.random.shuffle(image_list)
+
+    x_train = np.zeros((0, 3, 227, 227))
+    x_val = np.zeros((0, 3, 227, 227))
+    x_test = np.zeros((0, 3, 227, 227))
+
+    for i in range(len(image_list)):
+        img = imread("./Resource/cropped_227/" + image_list[i])
+        img = img[:, :, :3]
+        img = img/128. - 1.
+        img = np.rollaxis(img, -1).astype(np.float32)
+        img = np.reshape(img, [1, 3, 227, 227])
+        if i in range(10):
+            x_test = np.vstack((x_test, img))
+        elif i in range(10, 20):
+            x_val = np.vstack((x_val, img))
+        else:
+            x_train = np.vstack((x_train, img))
+
+    return x_train, x_val, x_test
+
+# We modify the torchvision implementation so that the features
+# after the final pooling layer is easily accessible by calling
+#       net.features(...)
+# If you would like to use other layer features, you will need to
+# make similar modifications.
+class MyAlexNet(nn.Module):
+    def load_weights(self):
+        an_builtin = torchvision.models.alexnet(pretrained=True)
+
+        features_weight_i = [0, 3, 6, 8, 10]
+        for i in features_weight_i:
+            self.features[i].weight = an_builtin.features[i].weight
+            self.features[i].bias = an_builtin.features[i].bias
+
+        classifier_weight_i = [1, 4, 6]
+        for i in classifier_weight_i:
+            self.classifier[i].weight = an_builtin.classifier[i].weight
+            self.classifier[i].bias = an_builtin.classifier[i].bias
+
+    def __init__(self, num_classes=1000):
+        super(MyAlexNet, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+        )
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
+
+        self.load_weights()
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), 256 * 13 * 13)
+        return x
 
 
-def generate_data_dict(resolution = 32):
-    """
-    Generate the training, validation and test set for all the target actors
-    The default test size is 20.
-    Note:
-    training : val = 80 : 20
-    :param resolution: the resolution (32 or 64)
-    :type resolution: int
-    :return: a dict containing each actor's training, validation and test set
-    :rtype: dict
-    """
-    data = {}
-    if resolution == 32:
-        path = CROPPED32
-    else:
-        path = CROPPED64
+def train_nn(dim_h, alpha, max_iter):
+    model = MyAlexNet()
+    model.eval()
+    # hyper-param
+    torch.manual_seed(5)
+    dim_x = 256 * 13 * 13
+    dim_out = len(actor_names)
 
-    for i, actor in enumerate(actor_names):
-        all_actor_image = np.array([process_image(image, resolution) for image in os.listdir(path) if actor in image])
-        test_size = 20
-        train_size = int((all_actor_image.shape[0] - test_size) * .8)
-        val_size = all_actor_image.shape[0] - test_size - train_size
+    # get data
+    print "========== Fetching Data =========="
+    x_train, y_train = np.zeros((0, 3, 227, 227)), np.zeros((0, len(actor_names)))
+    x_val, y_val = np.zeros((0, 3, 227, 227)), np.zeros((0, len(actor_names)))
+    x_test, y_test = np.zeros((0, 3, 227, 227)), np.zeros((0, len(actor_names)))
 
-        np.random.seed(0)
-        np.random.shuffle(all_actor_image)
+    for i in range(len(actor_names)):
+        a_name = actor_names[i]
 
-        data["train" + str(i)] = all_actor_image[:train_size, :]
-        data["val" + str(i)] = all_actor_image[train_size: train_size + val_size, :]
-        data["test" + str(i)] = all_actor_image[train_size + val_size:, :]
+        x_train_i, x_val_i, x_test_i = generate_sets(a_name)
 
-    return data
-
-
-def get_set(data, type, resolution = 32):
-    """
-    Get the full train/val/test set
-    :param data: the data dict
-    :type data: dict
-    :param type: the type of set to get (train/val/test)
-    :type type: str
-    :param resolution: the resolution (32/64)
-    :type resolution: int
-    :return: the batch data
-    :rtype: tuple (x, y)
-    """
-    batch_x_s = np.zeros((0, resolution * resolution))
-    batch_y_s = np.zeros((0, len(actor_names)))
-    set_k = [type + str(i) for i in range(len(actor_names))]
-
-    for k in range(len(actor_names)):
-        batch_x_s = np.vstack((batch_x_s, ((np.array(data[set_k[k]])[:]) / 255.)))
         one_hot = np.zeros(len(actor_names))
-        one_hot[k] = 1
-        batch_y_s = np.vstack((batch_y_s, np.tile(one_hot, (len(data[set_k[k]]), 1))))
-    return batch_x_s, batch_y_s
+        one_hot[i] = 1
 
+        x_train = np.vstack((x_train, x_train_i))
+        x_val = np.vstack((x_val, x_val_i))
+        x_test = np.vstack((x_test, x_test_i))
 
-def train_nn(x_train, y_train, x_val, y_val, x_test, y_test, dim_h, alpha, epoch, batch_size,
-          max_iter, resolution = 32):
+        y_train = np.vstack((y_train, np.tile(one_hot, (x_train_i.shape[0], 1))))
+        y_val = np.vstack((y_val, np.tile(one_hot, (x_val_i.shape[0], 1))))
+        y_test = np.vstack((y_test, np.tile(one_hot, (x_test_i.shape[0], 1))))
+
+    train_activation = np.zeros((0, 256 * 13 * 13))
+    val_activation = np.zeros((0, 256 * 13 * 13))
+    test_activation = np.zeros((0, 256 * 13 * 13))
+
+    print x_train.shape
+    for i in range(4):
+        x = Variable(torch.from_numpy(x_train[100 * i: 100 * (i + 1)]),
+                     requires_grad=False).type(dtype_float)
+        train_activation = np.vstack((train_activation, model.forward(x).data.numpy()))
+
+    x = Variable(torch.from_numpy(x_train[400:]), requires_grad=False).type(dtype_float)
+    train_activation = np.vstack((train_activation, model.forward(x).data.numpy()))
+
+    x = Variable(torch.from_numpy(x_val), requires_grad=False).type(dtype_float)
+    val_activation = np.vstack((val_activation, model.forward(x).data.numpy()))
+
+    x = Variable(torch.from_numpy(x_test), requires_grad=False).type(dtype_float)
+    test_activation = np.vstack((test_activation, model.forward(x).data.numpy()))
+
+    # train
     print "========== Start Training =========="
-    dim_x = resolution * resolution
-    dim_out = 12
+    x = Variable(torch.from_numpy(train_activation), requires_grad=False).type(dtype_float)
+    y_classes = Variable(torch.from_numpy(np.argmax(y_train, 1)), requires_grad=False).type(dtype_long)
 
-    torch.manual_seed(10)
-    model = torch.nn.Sequential(torch.nn.Linear(dim_x, dim_h),
-                                torch.nn.ReLU(),
-                                torch.nn.Linear(dim_h, dim_out))
-    # random weights and biases
-    model[0].weight = torch.nn.Parameter(torch.randn(model[0].weight.size()))
-    model[0].bias = torch.nn.Parameter(torch.randn(model[0].bias.size()))
+    new_model = torch.nn.Sequential(
+        torch.nn.Linear(dim_x, dim_h),
+        torch.nn.ReLU(),
+        torch.nn.Linear(dim_h, dim_out),
+    )
 
     loss_fn = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=alpha)
 
-    train_results = []
-    val_results = []
-    test_results = []
-
-    for k in range(epoch):
-        print "========== The {}th Epoch ==========".format(k + 1)
-        batches = np.array_split(np.random.permutation(range(x_train.shape[0]))[:], batch_size)
-
-        for i, mini_batch in enumerate(batches):
-            print "\t===== The {}th Batch =====".format(i + 1)
-            x = Variable(torch.from_numpy(x_train[mini_batch]),
-                         requires_grad=False).type(dtype_float)
-            y_classes = Variable(torch.from_numpy(np.argmax(y_train[mini_batch], 1)),
-                                 requires_grad=False).type(dtype_long)
-            # Train the model
-            for t in range(max_iter):
-                y_pred = model(x)
-                loss = loss_fn(y_pred, y_classes)
-
-                model.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-            # train set result
-            x = Variable(torch.from_numpy(x_train), requires_grad=False).type(dtype_float)
-            y_pred = model(x).data.numpy()
-            train_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_train, 1))
-            train_results.append(train_res)
-
-            # val set result
-            x = Variable(torch.from_numpy(x_val), requires_grad=False).type(dtype_float)
-            y_pred = model(x).data.numpy()
-            val_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_val, 1))
-            val_results.append(val_res)
-
-            # test set result
-            x = Variable(torch.from_numpy(x_test), requires_grad=False).type(dtype_float)
-            y_pred = model(x).data.numpy()
-            test_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_test, 1))
-            test_results.append(test_res)
-
-    #Get results on test set
-    x = Variable(torch.from_numpy(x_test), requires_grad=False).type(dtype_float)
-    y_pred = model(x).data.numpy()
-    final_test_result = np.mean(np.argmax(y_pred, 1) == np.argmax(y_test, 1))
-
-    if resolution == 32:
-        pickle.dump(model, open("temp/8/model_32.p", "wb"))
-    else:
-        pickle.dump(model, open("temp/8/model_64.p", "wb"))
-
-    return train_results, val_results, test_results, final_test_result
+    epoch = []
+    train_perf = []
+    val_perf = []
+    test_perf = []
 
 
-def weight_visual(W, dir, resolution = 32):
+    optimizer = torch.optim.Adam(new_model.parameters(), lr=alpha)
+    for i in range(max_iter):
+        y_pred = new_model(x)
+        loss = loss_fn(y_pred, y_classes)
 
-    print W.shape
-    for i in range(W.shape[0]):
-        img = reshape(W[i, :], (resolution, resolution))
-        imsave(dir + "{}.png".format(str(i)), img, cmap = "RdBu")
-    return
+        new_model.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if i % 10 == 0 or i == max_iter - 1:
+            print "\nIteration {}".format(i)
+            epoch.append(i)
+
+            x_train = Variable(torch.from_numpy(train_activation), requires_grad=False).type(dtype_float)
+            y_pred = new_model(x_train).data.numpy()
+            train_perf_i = (np.mean(np.argmax(y_pred, 1) == np.argmax(y_train, 1))) * 100
+            print("Training: {}%".format(train_perf_i))
+            train_perf.append(train_perf_i)
+
+            x_val = Variable(torch.from_numpy(val_activation), requires_grad=False).type(dtype_float)
+            y_pred = new_model(x_val).data.numpy()
+            val_perf_i = (np.mean(np.argmax(y_pred, 1) == np.argmax(y_val, 1))) * 100
+            print("Validation: {}%".format(val_perf_i))
+            val_perf.append(val_perf_i)
+
+            x_test = Variable(torch.from_numpy(test_activation), requires_grad=False).type(dtype_float)
+            y_pred = new_model(x_test).data.numpy()
+            test_perf_i = (np.mean(np.argmax(y_pred, 1) == np.argmax(y_test, 1))) * 100
+            print("Testing: {}%".format(test_perf_i))
+            test_perf.append(test_perf_i)
+
+    return epoch, train_perf, val_perf, test_perf
 
 
-def part8(resolution = 32):
-    data = generate_data_dict(resolution = resolution)
-    x_train, y_train = get_set(data, "train", resolution = resolution)
-    x_val, y_val = get_set(data, "val", resolution = resolution)
-    x_test, y_test = get_set(data, "test", resolution = resolution)
+def part10():
+    alpha = 1e-4
+    max_iter = 150
+    dim_h = 600
 
-    dim_h = 20
-    alpha = 1e-3
-    epoch = 5
-    batch_size = 5
-    max_iter = 1000
-    train_results, val_results, test_results, final_test_result = \
-        train_nn(x_train, y_train, x_val, y_val, x_test, y_test, dim_h, alpha,
-                 epoch, batch_size, max_iter, resolution = resolution)
+    epoch, train_results, val_results, test_results = train_nn(dim_h, alpha, max_iter)
 
-    print "Final test result: {}".format(final_test_result)
 
-    epochs = np.linspace(1, epoch * batch_size, epoch * batch_size)
-    plt.plot(epochs, train_results, 'r-', label= 'Training Result')
-    plt.plot(epochs, val_results, 'g-', label= 'Validation Result')
-    plt.plot(epochs, test_results, 'b-', label= 'Test Result')
-    plt.title('Learning Curve for {}x{}'.format(resolution, resolution))
+    plt.plot(epoch, train_results, 'r-', label= 'Training Result')
+    plt.plot(epoch, val_results, 'g-', label= 'Validation Result')
+    plt.plot(epoch, test_results, 'b-', label= 'Test Result')
+    plt.title('Learning Curve for {}x{}'.format(227, 227))
     plt.xlabel('mini-batch')
     plt.ylabel('accuracy')
     plt.legend(loc="best")
-    if resolution == 32:
-        plt.savefig("Report/images/8/a.png")
-    else:
-        plt.savefig("Report/images/8/b.png")
+    plt.savefig("Report/images/10/a.png")
     plt.close()
 
     return
 
-
-def part9(resolution = 32):
-    if resolution == 32:
-        model = pickle.load(open("temp/8/model_32.p", "rb"))
-    else:
-        model = pickle.load(open("temp/8/model_64.p", "rb"))
-    W = model[0].weight.data.numpy()
-    weight_visual(W, 'Report/images/9/', resolution)
-
-    # determine which hidden unit is representing which acter
-    x = Variable(torch.from_numpy(W), requires_grad=False).type(dtype_float)
-    y = model(x).data.numpy()
-    for k in range(y.shape[0]):
-        print k, actor_names[np.argmax(y[k, :])]
-
-
 if __name__ == "__main__":
-    # part8(32)
-    # part9(32)
-    part8(64)
-    part9(64)
+    part10()

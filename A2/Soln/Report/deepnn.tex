@@ -355,8 +355,14 @@
 	%	PROBLEM 7
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
+		For computing the gradient with respect to each weight individually,  assume $N$ layers containing the layer of inputs, so that there are total of $N-1$ layers of weights, each contains $K \times K$ weights. It is reasonable to assume that running time is somehow related with the total number of one-layer-down derivatives computed, where one-layer-down derivatives means that there is no need to apply chain-rule. With that assumption in mind, we consider the running time is the number of one-layer-sown derivatives computed. In the first layer of weight, which is between layer $N$ and $N - 1$, for each weight, we need to compute 2 OLDD(one-layer-down derivatives) , so total is $2K^2$ OLDD computed, in the second layer, there is $K^2 \times (2 \times K + 1) $ OLDD computed, in the third layer, there is $K^2 \times ((2 \times K)^2 + 1) $, etc...
+		in last layer, there is $K^2 \times ((2 \times K)^{N - 2} + 1) $, so total OLDD computed is $K^2 \times (2 + (2K + 1) + \dots + ((2K)^{N-2} + 1)) = NK^2 + K^2(2K \times \dfrac{1 - (2K)^{N - 2}}{1- 2K})$  (By the formula of summation for geometric sequence), $\dfrac{1 - (2K)^{N - 2}}{1- 2K}$ approximately equals to $\dfrac{(2K)^{N - 2}}{2K}$  when K is not too small, so total OLDD computed is 
+		approximately equals to $NK^2 + 2^{N- 2}K^{N}$, which is $O(K^{N})$ when N and K are reasonably big.\\
 		
-
+		
+		For fully-vectorized Backpropagation algorithm, make the same assumption that $N$ layers contains the layer of inputs, so that there are still total of $N - 1$ layers of weights, also, we make the assumption that time cost for multiplying 2 $K \times K$ matrix is O($K ^ 4$), in the first layer of weights, there is one matrix multiplication we need to compute, takes O($K ^ 4$), one layer deeper it goes, one more matrix multiplication it makes, since there are total $N - 1$ layers of weights, so computation of gradient with respect to weight for the first layer of weights takes $O((N-1)K^4)$, and since we can caching intermediate results in fully-vectorized Backpropagation algorithm, once we find the time cost for first layer, we can claim that total time cost can't exceed time cost for first layer too much since  for upper layers we can use cached results to make computation simpler, so total time cost is $O((N-1)K^4)$.\\
+		
+		So conclusion is that fully-vectorized Backpropagation algorithm is much faster if N and K are reasonably big, since time cost for it is linearity between N and K rather than exponential. 
 
 	\end{homeworkProblem}
 	\clearpage
@@ -433,7 +439,22 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-
+		The learning curve is shown in Fig \ref{fig:10.1}.
+		
+		To extract the last conv2d layer, the last ReLU and MaxPool2d layers are removed. The training : validation : test set ratio is same as in part 8. The network  uses Adam as its optimizer. There are 600 hidden units and the learning rate is 0.0001 with 150 iterations.
+		
+		The final performance of the network after training is as follows: \\
+		
+		Training: 98.6754966887\%\\
+		Validation: 95.0\%\\
+		Testing: 93.3333333333\%\\
+		
+		\begin{figure}[!ht]
+			\centering
+			\includegraphics[width=.75\linewidth]{images/10/a.png}
+			\caption{Learning curve}
+			\label{fig:10.1}
+		\end{figure}
 
 	\end{homeworkProblem}
 	\clearpage

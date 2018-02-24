@@ -1,21 +1,22 @@
 from util import *
-import get_data
-from pylab import *
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cbook as cbook
-import random
-import time
-from scipy.misc import *
-import matplotlib.image as mpimg
-import os
-from scipy.ndimage import filters
-import urllib
-import itertools
+import torch
+from torch.autograd import *
+
+
+# ----------- CONSTANTS -----------
+# We denote male as 1 and female as 0
+actor_genders = {'Bracco': 0,
+                 'Gilpin': 0,
+                 'Harmon': 0,
+                 'Baldwin': 1,
+                 'Hader': 1,
+                 'Carell': 1}
+dtype_float = torch.FloatTensor
+dtype_long = torch.LongTensor
 
 
 # ----------- HELPER FUNCTIONS -----------
-def process_image(im):
+def process_image(im, resolution = 32):
     """
     Process the given image and output the data
     Args:
@@ -23,405 +24,204 @@ def process_image(im):
     Returns:
         the processed data
     """
-    data = imread("./cropped/" + im) / 225.
-    data = reshape(data, 1024)
-    data = np.insert(data, 0, 1)
+    if resolution == 32:
+        path = CROPPED32
+    else:
+        path = CROPPED64
+    data = imread(path + im).flatten() / 225.
+    data = data.reshape(resolution * resolution)
+    # data = np.insert(data, 0, 1)
+    return data.T
+
+
+def generate_data_dict(resolution = 32):
+    """
+    Generate the training, validation and test set for all the target actors
+    The default test size is 20.
+    Note:
+    training : val = 80 : 20
+    :param resolution: the resolution (32 or 64)
+    :type resolution: int
+    :return: a dict containing each actor's training, validation and test set
+    :rtype: dict
+    """
+    data = {}
+    if resolution == 32:
+        path = CROPPED32
+    else:
+        path = CROPPED64
+
+    for i, actor in enumerate(actor_names):
+        all_actor_image = np.array([process_image(image, resolution) for image in os.listdir(path) if actor in image])
+        test_size = 20
+        train_size = int((all_actor_image.shape[0] - test_size) * .8)
+        val_size = all_actor_image.shape[0] - test_size - train_size
+
+        np.random.seed(0)
+        np.random.shuffle(all_actor_image)
+
+        data["train" + str(i)] = all_actor_image[:train_size, :]
+        data["val" + str(i)] = all_actor_image[train_size: train_size + val_size, :]
+        data["test" + str(i)] = all_actor_image[train_size + val_size:, :]
+
     return data
 
 
-# noinspection PyTypeChecker
-def predict(im, theta):
+def get_set(data, type, resolution = 32):
     """
-    Predicts the image using trained theta.
-    Args:
-        im (str): the image file name
-        theta (vector[float]): trained theta
-    Returns:
-        prediction based on the trained theta
+    Get the full train/val/test set
+    :param data: the data dict
+    :type data: dict
+    :param type: the type of set to get (train/val/test)
+    :type type: str
+    :param resolution: the resolution (32/64)
+    :type resolution: int
+    :return: the batch data
+    :rtype: tuple (x, y)
     """
-    data = process_image(im)
-    prediction = np.dot(theta.T, data)
-    return prediction
+    batch_x_s = np.zeros((0, resolution * resolution))
+    batch_y_s = np.zeros((0, len(actor_names)))
+    set_k = [type + str(i) for i in range(len(actor_names))]
+
+    for k in range(len(actor_names)):
+        batch_x_s = np.vstack((batch_x_s, ((np.array(data[set_k[k]])[:]) / 255.)))
+        one_hot = np.zeros(len(actor_names))
+        one_hot[k] = 1
+        batch_y_s = np.vstack((batch_y_s, np.tile(one_hot, (len(data[set_k[k]]), 1))))
+    return batch_x_s, batch_y_s
 
 
-# ----------- Answers -----------
+def train_nn(x_train, y_train, x_val, y_val, x_test, y_test, dim_h, alpha, epoch, batch_size,
+          max_iter, resolution = 32):
+    print "========== Start Training =========="
+    dim_x = resolution * resolution
+    dim_out = 12
 
-# Part 1
-# See faces.pdf
+    torch.manual_seed(10)
+    model = torch.nn.Sequential(torch.nn.Linear(dim_x, dim_h),
+                                torch.nn.ReLU(),
+                                torch.nn.Linear(dim_h, dim_out))
+    # random weights and biases
+    model[0].weight = torch.nn.Parameter(torch.randn(model[0].weight.size()))
+    model[0].bias = torch.nn.Parameter(torch.randn(model[0].bias.size()))
 
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=alpha)
 
-# Part 2
-def divide_sets(actor, training_size = 0, path = "./cropped"):
-    """
-    Given the downloaded data set and a selected actor, return three randomized list
-    of training set, validation set and test set.
-    Args:
-        actor (str): The selected actor
-        training_size (int): The size of the training set. return the full training
-                             set if set to 0
-        path (str): The path to the cropped files
-    Returns:
-        ([training set], [validation set], [test set])
-        where   |training set|      >= 70
-                |validation set|    == 10
-                |test set|          == 10
-    """
-    if actor not in actor_count.keys():
-        print "Error: actor [{1}] is not included in the data set".format(actor)
-        raise ValueError("Actor not in the data set")
-    if actor_count[actor] < 90:
-        print "Warning: actor [{0}] only has [{1}] of images, which does not have " \
-              "enough photos to satisfy the training " \
-              "requirement".format(actor, actor_count[actor])
-    all_actor_image = [image for image in os.listdir(path) if actor in image]
-    np.random.shuffle(all_actor_image)
-    test_set = all_actor_image[0: 10]
-    validation_set = all_actor_image[10:20]
-    training_set = all_actor_image[20:]
-    if training_size != 0:
-        training_set = training_set[:min([training_size, len(training_set)])]
-    return training_set, validation_set, test_set
+    train_results = []
+    val_results = []
+    test_results = []
 
+    for k in range(epoch):
+        print "========== The {}th Epoch ==========".format(k + 1)
+        batches = np.array_split(np.random.permutation(range(x_train.shape[0]))[:], batch_size)
 
-# Part 3
-# noinspection PyTypeChecker
-def classify(actor1 = "baldwin", actor2 = "carell", training_size = 0,
-             validate = True, test = True):
-    """
-    Train a linear classifier on actors 1 and 2
-    Args:
-        actor1 (str): name of the first actor. We label actor1 as 1
-        actor2 (str): name of the second actor. We label actor2 as 0
-        training_size (int): number of elements in the training set. train the full
-                             set if size given is 0.
-        validate (bool): indicate if the function call validates the validation set
-        test (bool): indicate if the function call tests on the test set
-    Returns:
-        The trained theta vector
-    """
-    if actor1 not in actor_names or actor2 not in actor_names:
-        print "Error: actor(s) given is not in the data set"
-        raise ValueError
+        for i, mini_batch in enumerate(batches):
+            print "\t===== The {}th Batch =====".format(i + 1)
+            x = Variable(torch.from_numpy(x_train[mini_batch]),
+                         requires_grad=False).type(dtype_float)
+            y_classes = Variable(torch.from_numpy(np.argmax(y_train[mini_batch], 1)),
+                                 requires_grad=False).type(dtype_long)
+            # Train the model
+            for t in range(max_iter):
+                y_pred = model(x)
+                loss = loss_fn(y_pred, y_classes)
 
-    # divide all sets
-    actor1_training_set, actor1_validation_set, \
-    actor1_test_set = divide_sets(actor1, training_size)
-    actor2_training_set, actor2_validation_set, \
-    actor2_test_set = divide_sets(actor2, training_size)
+                model.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-    training_set = actor1_training_set + actor2_training_set
-    validation_set = actor1_validation_set + actor2_validation_set
-    test_set = actor1_test_set + actor2_test_set
+            # train set result
+            x = Variable(torch.from_numpy(x_train), requires_grad=False).type(dtype_float)
+            y_pred = model(x).data.numpy()
+            train_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_train, 1))
+            train_results.append(train_res)
 
-    print "\n----------- Training on {} data: -----------".format(len(training_set))
+            # val set result
+            x = Variable(torch.from_numpy(x_val), requires_grad=False).type(dtype_float)
+            y_pred = model(x).data.numpy()
+            val_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_val, 1))
+            val_results.append(val_res)
 
-    # initialize input, output and theta to zeros
-    # Note: we are removing the bias term by adding a dummy term in x: x_0
-    # x: N * D matrix
-    # y: N * 1 vector
-    # theta: D * 1 vector
-    x = np.zeros((len(training_set), 1025))
-    y = np.zeros((len(training_set), 1))
-    theta = np.zeros((1025, 1))
+            # test set result
+            x = Variable(torch.from_numpy(x_test), requires_grad=False).type(dtype_float)
+            y_pred = model(x).data.numpy()
+            test_res = np.mean(np.argmax(y_pred, 1) == np.argmax(y_test, 1))
+            test_results.append(test_res)
 
-    # fill the data with given data set
-    i = 0
-    for image in actor1_training_set:
-        data = process_image(image)
-        x[i] = data
-        y[i] = 1
-        i += 1
+    #Get results on test set
+    x = Variable(torch.from_numpy(x_test), requires_grad=False).type(dtype_float)
+    y_pred = model(x).data.numpy()
+    final_test_result = np.mean(np.argmax(y_pred, 1) == np.argmax(y_test, 1))
 
-    for image in actor2_training_set:
-        data = process_image(image)
-        x[i] = data
-        y[i] = 0
-        i += 1
-
-    # use gradient descent to train theta
-    if training_size >= 20:
-        theta = grad_descent(loss, dlossdx, x, y, theta, 0.005)
+    if resolution == 32:
+        pickle.dump(model, open("temp/8/model_32.p", "wb"))
     else:
-        theta = grad_descent(loss, dlossdx, x, y, theta, 0.001)
+        pickle.dump(model, open("temp/8/model_64.p", "wb"))
 
-    # validate on validation set
-    if validate is True:
-        print "----------- Validating -----------"
-        total = len(validation_set)
-        correct_count = 0
-        for im in validation_set:
-            prediction = predict(im, theta)
-            if im in actor1_validation_set and norm(prediction) > 0.5:
-                correct_count += 1
-            elif im in actor2_validation_set and norm(prediction) <= 0.5:
-                correct_count += 1
-        print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
-
-    if test is True:
-        # test on test set
-        print "----------- Testing -----------"
-        total = len(test_set)
-        correct_count = 0
-        for im in test_set:
-            prediction = predict(im, theta)
-            if im in actor1_validation_set and norm(prediction) > 0.5:
-                correct_count += 1
-            elif im in actor2_validation_set and norm(prediction) <= 0.5:
-                correct_count += 1
-        print "Result on [Test Set]: {} / {}".format(correct_count, total)
-
-    return theta
+    return train_results, val_results, test_results, final_test_result
 
 
-# Part 4
-# TODO: save RGB image
-# a)
-def plot_theta(actor1 = "baldwin", actor2 = "carell", compare_size = 2):
-    """
-    compare the thetas of different number of training sets
-    Args:
-        actor1 (str): the first actor's name
-        actor2 (str): the second actor's name
-        compare_size (int): the comparing training set's size. train full set if 0.
-    Returns:
-    """
-    full_theta = classify(actor1, actor2, validate = False, test = False)
-    # Note: theta contains a bias term as the first element so drop it
-    full_theta = np.delete(full_theta, 0)
-    full_theta = np.reshape(full_theta, (32, 32))
-    # ret = np.empty((full_theta.shape[0], full_theta.shape[1], 3), dtype=np.uint8)
-    # ret[:, :, 0] = full_theta
-    # ret[:, :, 1] = full_theta
-    # ret[:, :, 2] = full_theta
-    imsave("./Report/images/4/a_full_theta.jpg", full_theta)
-    # plt.imsave("./Report/images/4/a_full_theta.jpg", ret, cmap = "RdBu")
-    # toimage(full_theta).save("./Report/images/4/a_full_theta.jpg")
+def weight_visual(W, dir, resolution = 32):
 
-    two_theta = classify(actor1, actor2, compare_size, validate = False,
-                         test = False)
-    # print two_theta.shape
-    two_theta = np.delete(two_theta, 0)
-    two_theta = np.resize(two_theta, (32, 32))
-    # ret = np.empty((two_theta.shape[0], two_theta.shape[1], 3), dtype=np.uint8)
-    # ret[:, :, 0] = two_theta
-    # ret[:, :, 1] = two_theta
-    # ret[:, :, 2] = two_theta
-    imsave("./Report/images/4/a_two_theta.jpg", two_theta)
-    # plt.imsave("./Report/images/4/a_two_theta.jpg", ret, cmap = "RdBu")
-    # toimage(two_theta).save("./Report/images/4/a_two_theta.jpg")
+    print W.shape
+    for i in range(W.shape[0]):
+        img = reshape(W[i, :], (resolution, resolution))
+        imsave(dir + "{}.png".format(str(i)), img, cmap = "RdBu")
+    return
 
 
-# b)
-def visualize_gradient():
-    pass
+def part8(resolution = 32):
+    data = generate_data_dict(resolution = resolution)
+    x_train, y_train = get_set(data, "train", resolution = resolution)
+    x_val, y_val = get_set(data, "val", resolution = resolution)
+    x_test, y_test = get_set(data, "test", resolution = resolution)
+
+    dim_h = 20
+    alpha = 1e-3
+    epoch = 5
+    batch_size = 5
+    max_iter = 1000
+    train_results, val_results, test_results, final_test_result = \
+        train_nn(x_train, y_train, x_val, y_val, x_test, y_test, dim_h, alpha,
+                 epoch, batch_size, max_iter, resolution = resolution)
+
+    print "Final test result: {}".format(final_test_result)
+
+    epochs = np.linspace(1, epoch * batch_size, epoch * batch_size)
+    plt.plot(epochs, train_results, 'r-', label= 'Training Result')
+    plt.plot(epochs, val_results, 'g-', label= 'Validation Result')
+    plt.plot(epochs, test_results, 'b-', label= 'Test Result')
+    plt.title('Learning Curve for {}x{}'.format(resolution, resolution))
+    plt.xlabel('mini-batch')
+    plt.ylabel('accuracy')
+    plt.legend(loc="best")
+    if resolution == 32:
+        plt.savefig("Report/images/8/a.png")
+    else:
+        plt.savefig("Report/images/8/b.png")
+    plt.close()
+
+    return
 
 
-# Part 5
-act = ['Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon', 'Alec Baldwin',
-       'Bill Hader', 'Steve Carell']
+def part9(resolution = 32):
+    if resolution == 32:
+        model = pickle.load(open("temp/8/model_32.p", "rb"))
+    else:
+        model = pickle.load(open("temp/8/model_64.p", "rb"))
+    W = model[0].weight.data.numpy()
+    weight_visual(W, 'Report/images/9/', resolution)
 
-
-def overfitting():
-    """
-    Overfit the data
-    We denote male as 1 and female as 0
-    Returns:
-
-    """
-    training_sizes = [5, 10, 20, 50, 100, 150]
-    thetas = [np.zeros((1025, 1)) for i in range(6)]
-    training_actor_names = [a.split()[1].lower() for a in act]
-    actor_genders = {'bracco': 0,
-                     'chenoweth': 0,
-                     'drescher': 0,
-                     'ferrera': 0,
-                     'gilpin': 0,
-                     'harmon': 0,
-                     'baldwin': 1,
-                     'butler': 1,
-                     'carell': 1,
-                     'hader': 1,
-                     'radcliffe': 1,
-                     'vartan': 1}
-    # test_actor_names = [a for a in actor_names if a not in training_actor_names]
-
-    training_result = dict()
-    validation_result = dict()
-
-    for i in range(len(training_sizes)):
-        print "----------- Training on size {} -----------".format(training_sizes[i])
-        actor_training_set, actor_validation_set, \
-        actor_test_set = dict(), dict(), dict()
-
-        for a in training_actor_names:
-            actor_training_set[a], actor_validation_set[a], \
-            actor_test_set[a] = divide_sets(a, training_sizes[i])
-            print "[{}]: {}".format(a, len(actor_training_set[a]))
-
-        # get all training data
-        training_set = list(
-            itertools.chain.from_iterable(actor_training_set.values()))
-        validation_set = list(
-            itertools.chain.from_iterable(actor_validation_set.values()))
-
-        x = np.zeros((len(training_set), 1025))
-        y = np.zeros((len(training_set), 1))
-
-        # fill the data with given data set
-        j = 0
-        for actor in actor_training_set.keys():
-            for image in actor_training_set[actor]:
-                data = process_image(image)
-                x[j] = data
-                y[j] = actor_genders[actor]
-                j += 1
-
-        thetas[i] = grad_descent(loss, dlossdx, x, y, thetas[i], 0.005)
-
-        # test on training set
-        total = sum(
-            [len(actor_training_set[actor]) for actor in actor_training_set.keys()])
-        correct_count = 0
-        for actor in actor_training_set.keys():
-            for im in actor_training_set[actor]:
-                prediction = predict(im, thetas[i])
-                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-                    correct_count += 1
-                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
-                    correct_count += 1
-        correct_rate = 100. * correct_count / total
-        training_result[training_sizes[i]] = correct_rate
-
-        print "Result on [Training Set]: {} / {}\n".format(correct_count, total)
-
-        # test on validation set
-        total = sum(
-            [len(actor_validation_set[actor]) for actor in
-             actor_validation_set.keys()])
-        correct_count = 0
-        for actor in actor_validation_set.keys():
-            for im in actor_validation_set[actor]:
-                prediction = predict(im, thetas[i])
-                if actor_genders[actor] == 1 and norm(prediction) > 0.5:
-                    correct_count += 1
-                elif actor_genders[actor] == 0 and norm(prediction) <= 0.5:
-                    correct_count += 1
-        correct_rate = 100. * correct_count / total
-        validation_result[training_sizes[i]] = correct_rate
-        print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
-
-    plt.plot(training_sizes, [training_result[size] for size in training_sizes],
-             color = "r", linewidth = 2, marker = "o", label = "Training Set")
-    plt.plot(training_sizes, [validation_result[size] for size in training_sizes],
-             color = "b", linewidth = 2, marker = "o", label = "Validation Set")
-
-    plt.title("Training Set Size VS Performance")
-    plt.xlabel("Training Set Size / images")
-    plt.ylabel("Performance / %")
-    plt.legend()
-    plt.savefig("./Report/images/5/1.jpg")
-
-
-# Part 6
-# see faces.pdf for calculations and util.py for implementations
-
-
-# Part 7
-def multiclass_classification(test_training = True, validate = True):
-    # initialize sets
-    training_actor_names = [a.split()[1].lower() for a in act]
-    training_set, validation_set, test_set = dict(), dict(), dict()
-    for actor in training_actor_names:
-        training_set[actor], validation_set[actor], \
-            test_set[actor] = divide_sets(actor)
-
-    # get input data
-    x = np.zeros((len(list(itertools.chain.from_iterable(training_set.values()))),
-                  1025))
-    y = np.zeros((len(list(itertools.chain.from_iterable(training_set.values()))),
-                  len(training_actor_names)))
-
-    k = 0
-    for i in range(len(training_actor_names)):
-        for im in training_set[training_actor_names[i]]:
-            x[k] = process_image(im)
-            y[k][i] = 1
-            k += 1
-
-    # train theta
-    theta = np.zeros((len(training_actor_names), 1025))
-    theta = grad_descent_m(loss_m, dlossdx_m, x, y, theta, 0.0000001).T
-
-    # validate on training set
-    if test_training is True:
-        print "----------- Testing on Training Set -----------"
-        total = len(list(itertools.chain.from_iterable(training_set.values())))
-        correct_count = 0
-        for i in range(len(training_actor_names)):
-            for im in training_set[training_actor_names[i]]:
-                prediction = predict(im, theta)
-                prediction = np.argmax(prediction)
-                if prediction == i:
-                    correct_count += 1
-        print "Result on [Training Set]: {} / {}\n".format(correct_count, total)
-
-    # validate on validation set
-    if validate is True:
-        print "----------- Testing on Validation Set -----------"
-        total = len(list(itertools.chain.from_iterable(validation_set.values())))
-        correct_count = 0
-        for i in range(len(training_actor_names)):
-            for im in validation_set[training_actor_names[i]]:
-                prediction = predict(im, theta)
-                prediction = np.argmax(prediction)
-                if prediction == i:
-                    correct_count += 1
-        print "Result on [Validation Set]: {} / {}\n".format(correct_count, total)
-
-    return theta
-
-
-# Part 8
-def plot_theta_multiclass():
-    training_actor_names = [a.split()[1].lower() for a in act]
-    thetas = multiclass_classification(False, False).T
-
-    for i in range(thetas.shape[0]):
-        theta = np.delete(thetas[i], 0)
-        theta = np.reshape(theta, (32, 32))
-        # ret = np.empty((theta.shape[0], theta.shape[1], 3), dtype=np.uint8)
-        # ret[:, :, 0] = theta
-        # ret[:, :, 1] = theta
-        # ret[:, :, 2] = theta
-        imsave("./Report/images/8/{}.jpg".format(training_actor_names[i]), theta)
-        # imsave("./Report/images/8/{}.jpg".format(i), theta, cmap="RdBu")
-
+    # determine which hidden unit is representing which acter
+    x = Variable(torch.from_numpy(W), requires_grad=False).type(dtype_float)
+    y = model(x).data.numpy()
+    for k in range(y.shape[0]):
+        print k, actor_names[np.argmax(y[k, :])]
 
 
 if __name__ == "__main__":
-    # part 1
-
-    # part 2
-    actor = "baldwin"
-    a, b, c = divide_sets(actor)
-    print "{}\n{}\n{}".format(a, b, c)
-
-    # part 3
-    classify()
-
-    # part 4
-    # a)
-    plot_theta()
-
-    # b)
-
-    # part 5
-    overfitting()
-
-    # part 6
-
-    # part 7
-    multiclass_classification()
-
-    # part 8
-    plot_theta_multiclass()
+    # part8(32)
+    # part9(32)
+    part8(64)
+    part9(64)
