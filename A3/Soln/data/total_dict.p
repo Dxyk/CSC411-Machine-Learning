@@ -10,7 +10,7 @@ p3
 I1
 sS'looking'
 p4
-I5
+I4
 sS'kommonsentsjane'
 p5
 I1
@@ -91,7 +91,7 @@ p30
 I1
 sS'china'
 p31
-I41
+I39
 sS'dorm'
 p32
 I1
@@ -256,10 +256,10 @@ p85
 I1
 sS'wrong'
 p86
-I7
+I6
 sS'wins'
 p87
-I32
+I31
 sS'attracts'
 p88
 I1
@@ -370,7 +370,7 @@ p123
 I1
 sS're'
 p124
-I11
+I10
 sS'strategist'
 p125
 I6
@@ -571,7 +571,7 @@ p190
 I3
 sS'saying'
 p191
-I5
+I4
 sS'signatures'
 p192
 I1
@@ -682,7 +682,7 @@ p227
 I1
 sS'never'
 p228
-I9
+I8
 sS'parallels'
 p229
 I2
@@ -724,7 +724,7 @@ p241
 I7
 sS'and'
 p242
-I296
+I281
 sS'alternate'
 p243
 I1
@@ -958,7 +958,7 @@ p319
 I1
 sS'for'
 p320
-I379
+I367
 sS'fox'
 p321
 I10
@@ -1006,7 +1006,7 @@ p335
 I2
 sS'collett'
 p336
-I3
+I2
 sS'palestinians'
 p337
 I1
@@ -1075,7 +1075,7 @@ p358
 I1
 sS'back'
 p359
-I34
+I33
 sS'talents'
 p360
 I1
@@ -1435,7 +1435,7 @@ p478
 I1
 sS'so'
 p479
-I16
+I15
 sS'sc'
 p480
 I1
@@ -1459,7 +1459,7 @@ p486
 I1
 sS'kanye'
 p487
-I3
+I2
 sS'overhaul'
 p488
 I3
@@ -1609,7 +1609,7 @@ p536
 I1
 sS'vote'
 p537
-I54
+I53
 sS'open'
 p538
 I12
@@ -1912,7 +1912,7 @@ p637
 I1
 sS'wants'
 p638
-I21
+I20
 sS'former'
 p639
 I25
@@ -2107,7 +2107,7 @@ p702
 I3
 sS'favorite'
 p703
-I5
+I4
 sS'historischer'
 p704
 I1
@@ -2146,7 +2146,7 @@ p715
 I1
 sS'her'
 p716
-I28
+I26
 sS'hes'
 p717
 I4
@@ -2176,7 +2176,7 @@ p725
 I2
 sS'with'
 p726
-I204
+I202
 sS'buying'
 p727
 I3
@@ -2254,10 +2254,10 @@ p751
 I2
 sS'as'
 p752
-I151
+I146
 sS'at'
 p753
-I131
+I130
 sS'hofstra'
 p754
 I1
@@ -2311,10 +2311,10 @@ p770
 I1
 sS'riots'
 p771
-I12
+I11
 sS'to'
 p772
-I822
+I746
 sS'nord'
 p773
 I1
@@ -2638,7 +2638,7 @@ p879
 I1
 sS'blacks'
 p880
-I9
+I8
 sS'race'
 p881
 I12
@@ -2725,7 +2725,7 @@ p908
 I1
 sS'obama'
 p909
-I94
+I92
 sS'superluna'
 p910
 I1
@@ -3151,7 +3151,7 @@ p1050
 I1
 sS'by'
 p1051
-I135
+I134
 sS'deserved'
 p1052
 I2
@@ -3166,7 +3166,7 @@ p1055
 I2
 sS'clinton'
 p1056
-I215
+I214
 sS'terrorists'
 p1057
 I1
@@ -3232,13 +3232,13 @@ p1077
 I1
 sS'up'
 p1078
-I55
+I54
 sS'us'
 p1079
-I269
+I268
 sS'un'
 p1080
-I34
+I33
 sS'customers'
 p1081
 I1
@@ -3448,7 +3448,7 @@ p1149
 I1
 sS'punch'
 p1150
-I5
+I4
 sS'les'
 p1151
 I2
@@ -3463,7 +3463,7 @@ p1154
 I1
 sS'great'
 p1155
-I14
+I13
 sS'engage'
 p1156
 I1
@@ -3529,7 +3529,7 @@ p1176
 I1
 sS'on'
 p1177
-I371
+I364
 sS'dealings'
 p1178
 I1
@@ -3553,7 +3553,7 @@ p1184
 I1
 sS'this'
 p1185
-I40
+I39
 sS'challenge'
 p1186
 I4
@@ -3574,7 +3574,7 @@ p1191
 I1
 sS'lock'
 p1192
-I4
+I3
 sS'slim'
 p1193
 I1
@@ -3691,7 +3691,7 @@ p1230
 I1
 sS'2016'
 p1231
-I11
+I10
 sS'elites'
 p1232
 I7
@@ -3880,7 +3880,7 @@ p1293
 I1
 sS'chief'
 p1294
-I28
+I27
 sS'ministerien'
 p1295
 I1
@@ -3988,7 +3988,7 @@ p1329
 I3
 sS'taxes'
 p1330
-I6
+I5
 sS'reid'
 p1331
 I4
@@ -4792,7 +4792,7 @@ p1597
 I1
 sS'they'
 p1598
-I38
+I36
 sS'457'
 p1599
 I1
@@ -4981,7 +4981,7 @@ p1660
 I4
 sS'what'
 p1661
-I89
+I87
 sS'germany'
 p1662
 I3
@@ -4990,7 +4990,7 @@ p1663
 I5
 sS'voting'
 p1664
-I31
+I30
 sS'notion'
 p1665
 I1
@@ -5023,7 +5023,7 @@ p1674
 I11
 sS'dc'
 p1675
-I11
+I10
 sS'haunted'
 p1676
 I1
@@ -5032,10 +5032,10 @@ p1677
 I1
 sS'du'
 p1678
-I3
+I2
 sS'dr'
 p1679
-I12
+I9
 sS'runs'
 p1680
 I1
@@ -5104,10 +5104,10 @@ p1701
 I1
 sS'gays'
 p1702
-I3
+I2
 sS'admirals'
 p1703
-I4
+I3
 sS'travellers'
 p1704
 I2
@@ -5119,7 +5119,7 @@ p1706
 I3
 sS'climate'
 p1707
-I37
+I36
 sS'cor'
 p1708
 I1
@@ -5278,7 +5278,7 @@ p1759
 I4
 sS'the'
 p1760
-I612
+I519
 sS'camps'
 p1761
 I1
@@ -5374,7 +5374,7 @@ p1791
 I1
 sS'comments'
 p1792
-I32
+I31
 sS'mulls'
 p1793
 I1
@@ -5476,7 +5476,7 @@ p1825
 I24
 sS'moore'
 p1826
-I15
+I13
 sS'scandalous'
 p1827
 I1
@@ -5683,7 +5683,7 @@ p1894
 I6
 sS'change'
 p1895
-I28
+I27
 sS'sending'
 p1896
 I1
@@ -5716,7 +5716,7 @@ p1905
 I1
 sS'market'
 p1906
-I13
+I12
 sS'podesta'
 p1907
 I2
@@ -5758,7 +5758,7 @@ p1919
 I1
 sS'can'
 p1920
-I32
+I31
 sS'cam'
 p1921
 I1
@@ -5866,10 +5866,10 @@ p1955
 I1
 sS'not'
 p1956
-I85
+I84
 sS'now'
 p1957
-I30
+I29
 sS'hall'
 p1958
 I2
@@ -5896,7 +5896,7 @@ p1965
 I1
 sS'el'
 p1966
-I5
+I4
 sS'domain'
 p1967
 I1
@@ -6052,7 +6052,7 @@ p2017
 I4
 sS'that'
 p2018
-I64
+I63
 sS'appreciates'
 p2019
 I1
@@ -6208,7 +6208,7 @@ p2069
 I2
 sS'3'
 p2070
-I19
+I18
 sS'between'
 p2071
 I17
@@ -6307,7 +6307,7 @@ p2102
 I1
 sS'commander'
 p2103
-I5
+I4
 sS'canceled'
 p2104
 I1
@@ -6571,7 +6571,7 @@ p2190
 I1
 sS'you'
 p2191
-I71
+I65
 sS'forcing'
 p2192
 I1
@@ -6856,7 +6856,7 @@ p2285
 I2
 sS'a'
 p2286
-I285
+I264
 sS'read'
 p2287
 I2
@@ -6997,7 +6997,7 @@ p2332
 I2
 sS'7'
 p2333
-I12
+I10
 sS'issue'
 p2334
 I1
@@ -7540,7 +7540,7 @@ p2513
 I1
 sS'run'
 p2514
-I11
+I10
 sS'processing'
 p2515
 I1
@@ -7762,7 +7762,7 @@ p2587
 I1
 sS'michael'
 p2588
-I23
+I22
 sS'ryan'
 p2589
 I8
@@ -8509,7 +8509,7 @@ p2836
 I1
 sS'i'
 p2837
-I42
+I36
 sS'obstacles'
 p2838
 I1
@@ -8608,7 +8608,7 @@ p2869
 I1
 sS'twitter'
 p2870
-I26
+I25
 sS'hush'
 p2871
 I1
@@ -8698,16 +8698,16 @@ p2899
 I1
 sS'goals'
 p2900
-I3
+I2
 sS'courts'
 p2901
 I1
 sS'ha'
 p2902
-I2
+I1
 sS'he'
 p2903
-I119
+I114
 sS'oligarchy'
 p2904
 I5
@@ -8923,7 +8923,7 @@ p2974
 I1
 sS'new'
 p2975
-I106
+I105
 sS'tips'
 p2976
 I1
@@ -9013,7 +9013,7 @@ p3004
 I5
 sS'call'
 p3005
-I40
+I39
 sS'calm'
 p3006
 I1
@@ -9088,7 +9088,7 @@ p3029
 I3
 sS'president'
 p3030
-I130
+I127
 sS'trumpkin'
 p3031
 I1
@@ -9370,7 +9370,7 @@ p3123
 I1
 sS'm'
 p3124
-I19
+I16
 sS'dog'
 p3125
 I4
@@ -9625,10 +9625,10 @@ p3208
 I30
 sS'is'
 p3209
-I235
+I226
 sS'it'
 p3210
-I88
+I84
 sS'defeated'
 p3211
 I1
@@ -9643,7 +9643,7 @@ p3214
 I2
 sS'in'
 p3215
-I445
+I431
 sS'faked'
 p3216
 I1
@@ -9652,7 +9652,7 @@ p3217
 I1
 sS'if'
 p3218
-I72
+I71
 sS'make'
 p3219
 I28
@@ -9697,7 +9697,7 @@ p3232
 I11
 sS'just'
 p3233
-I82
+I80
 sS'unfair'
 p3234
 I3
@@ -9724,7 +9724,7 @@ p3241
 I7
 sS'about'
 p3242
-I78
+I75
 sS'recreates'
 p3243
 I1
@@ -9760,7 +9760,7 @@ p3253
 I66
 sS'dead'
 p3254
-I7
+I6
 sS'dear'
 p3255
 I3
@@ -9958,7 +9958,7 @@ p3319
 I1
 sS'me'
 p3320
-I12
+I11
 sS'inciting'
 p3321
 I1
@@ -10165,7 +10165,7 @@ p3388
 I2
 sS'may'
 p3389
-I25
+I24
 sS'max'
 p3390
 I1
@@ -10207,7 +10207,7 @@ p3402
 I1
 sS'neck'
 p3403
-I2
+I1
 sS'johnson'
 p3404
 I2
@@ -10270,13 +10270,13 @@ p3423
 I2
 sS'msnbc'
 p3424
-I8
+I7
 sS'undermines'
 p3425
 I1
 sS'texas'
 p3426
-I17
+I16
 sS'finance'
 p3427
 I5
@@ -10399,7 +10399,7 @@ p3466
 I16
 sS'first'
 p3467
-I69
+I67
 sS'fleeing'
 p3468
 I1
@@ -10420,7 +10420,7 @@ p3473
 I4
 sS'little'
 p3474
-I7
+I6
 sS'hollyweirdos'
 p3475
 I1
@@ -10603,7 +10603,7 @@ p3534
 I3
 sS'black'
 p3535
-I35
+I34
 sS'treasury'
 p3536
 I1
@@ -11116,7 +11116,7 @@ p3705
 I1
 sS'students'
 p3706
-I7
+I6
 sS'narrative'
 p3707
 I3
@@ -11134,7 +11134,7 @@ p3711
 I1
 sS'u'
 p3712
-I21
+I19
 sS'resolution'
 p3713
 I1
@@ -11173,7 +11173,7 @@ p3724
 I1
 sS'gorafi'
 p3725
-I8
+I7
 sS'redecorate'
 p3726
 I1
@@ -11851,7 +11851,7 @@ p3950
 I1
 sS'gay'
 p3951
-I3
+I2
 sS'honorary'
 p3952
 I1
@@ -12358,7 +12358,7 @@ p4119
 I1
 sS'30'
 p4120
-I4
+I3
 sS'37'
 p4121
 I1
@@ -12427,7 +12427,7 @@ p4142
 I1
 sS'f'
 p4143
-I12
+I11
 sS'nafta'
 p4144
 I4
@@ -12517,16 +12517,16 @@ p4172
 I1
 sS'electors'
 p4173
-I3
+I2
 sS'nasty'
 p4174
 I4
 sS'le'
 p4175
-I12
+I10
 sS'la'
 p4176
-I9
+I7
 sS'll'
 p4177
 I7
@@ -12574,7 +12574,7 @@ p4191
 I3
 sS'day'
 p4192
-I29
+I28
 sS'applicants'
 p4193
 I1
@@ -12607,7 +12607,7 @@ p4202
 I7
 sS'announces'
 p4203
-I15
+I14
 sS'rep'
 p4204
 I1
@@ -12685,7 +12685,7 @@ p4228
 I1
 sS'have'
 p4229
-I43
+I41
 sS'apparently'
 p4230
 I2
@@ -12745,7 +12745,7 @@ p4248
 I2
 sS'supporter'
 p4249
-I35
+I33
 sS'staff'
 p4250
 I7
@@ -12796,7 +12796,7 @@ p4265
 I1
 sS'we'
 p4266
-I39
+I35
 sS'awaits'
 p4267
 I2
@@ -13027,7 +13027,7 @@ p4342
 I1
 sS'like'
 p4343
-I29
+I28
 sS'success'
 p4344
 I1
@@ -13264,7 +13264,7 @@ p4421
 I1
 sS'hate'
 p4422
-I11
+I10
 sS'assembled'
 p4423
 I1
@@ -13339,7 +13339,7 @@ p4446
 I1
 sS'endorse'
 p4447
-I6
+I5
 sS'dauphin'
 p4448
 I1
@@ -13357,7 +13357,7 @@ p4452
 I5
 sS'generals'
 p4453
-I4
+I3
 sS'leaves'
 p4454
 I6
@@ -13507,7 +13507,7 @@ p4502
 I3
 sS'over'
 p4503
-I86
+I85
 sS'london'
 p4504
 I3
@@ -13888,7 +13888,7 @@ p4629
 I1
 sS'news'
 p4630
-I65
+I64
 sS'blasted'
 p4631
 I1
@@ -14110,7 +14110,7 @@ p4703
 I1
 sS'donald'
 p4704
-I1057
+I1056
 sS'usher'
 p4705
 I1
@@ -14170,7 +14170,7 @@ p4723
 I1
 sS'duke'
 p4724
-I14
+I9
 sS'donates'
 p4725
 I1
@@ -14200,7 +14200,7 @@ p4733
 I2
 sS'head'
 p4734
-I10
+I8
 sS'attempted'
 p4735
 I1
@@ -14254,7 +14254,7 @@ p4751
 I1
 sS'no'
 p4752
-I33
+I32
 sS'na'
 p4753
 I1
@@ -14386,7 +14386,7 @@ p4795
 I1
 sS'says'
 p4796
-I225
+I224
 sS'pms'
 p4797
 I1
@@ -14503,7 +14503,7 @@ p4834
 I2
 sS'trump'
 p4835
-I3072
+I3021
 sS'downfall'
 p4836
 I1
@@ -14761,7 +14761,7 @@ p4920
 I1
 sS'cops'
 p4921
-I2
+I1
 sS'huw'
 p4922
 I1
@@ -14794,7 +14794,7 @@ p4931
 I9
 sS'cards'
 p4932
-I4
+I3
 sS'frydenberg'
 p4933
 I1
@@ -15229,7 +15229,7 @@ p5076
 I1
 sS'tower'
 p5077
-I8
+I7
 sS'shunned'
 p5078
 I1
@@ -15286,7 +15286,7 @@ p5095
 I1
 sS'of'
 p5096
-I398
+I378
 sS'discussed'
 p5097
 I1
@@ -15301,7 +15301,7 @@ p5100
 I2
 sS'or'
 p5101
-I26
+I25
 sS'op'
 p5102
 I3
@@ -15691,7 +15691,7 @@ p5230
 I2
 sS'major'
 p5231
-I20
+I19
 sS'disabled'
 p5232
 I3
@@ -15976,7 +15976,7 @@ p5325
 I2
 sS'his'
 p5326
-I87
+I83
 sS'founding'
 p5327
 I1
@@ -16372,7 +16372,7 @@ p5457
 I2
 sS'independents'
 p5458
-I3
+I2
 sS'nostradamus'
 p5459
 I2
@@ -16576,7 +16576,7 @@ p5525
 I6
 sS'from'
 p5526
-I96
+I94
 sS'usa'
 p5527
 I6
@@ -16741,7 +16741,7 @@ p5580
 I1
 sS'crowds'
 p5581
-I5
+I4
 sS'violating'
 p5582
 I2
@@ -16855,7 +16855,7 @@ p5618
 I3
 sS'184'
 p5619
-I4
+I3
 sS'adrian'
 p5620
 I1
@@ -16921,7 +16921,7 @@ p5640
 I2
 sS'who'
 p5641
-I55
+I54
 sS'hamas'
 p5642
 I1
@@ -16930,7 +16930,7 @@ p5643
 I2
 sS'why'
 p5644
-I61
+I57
 sS'deny'
 p5645
 I2
@@ -17062,7 +17062,7 @@ p5687
 I2
 sS'job'
 p5688
-I9
+I8
 sS'takeover'
 p5689
 I2
@@ -17083,7 +17083,7 @@ p5694
 I1
 sS'wall'
 p5695
-I62
+I61
 sS'batavia'
 p5696
 I1
@@ -17149,7 +17149,7 @@ p5716
 I1
 sS'will'
 p5717
-I163
+I161
 sS'readies'
 p5718
 I1
@@ -17188,7 +17188,7 @@ p5729
 I2
 sS'gets'
 p5730
-I19
+I18
 sS'slave'
 p5731
 I2
@@ -17257,7 +17257,7 @@ p5752
 I3
 sS'other'
 p5753
-I9
+I8
 sS'unprecedented'
 p5754
 I1
@@ -17293,7 +17293,7 @@ p5764
 I1
 sS'because'
 p5765
-I19
+I18
 sS'scared'
 p5766
 I2
@@ -17368,7 +17368,7 @@ p5789
 I1
 sS'own'
 p5790
-I13
+I12
 sS'owe'
 p5791
 I1
@@ -17452,7 +17452,7 @@ p5817
 I1
 sS'book'
 p5818
-I8
+I7
 sS'boom'
 p5819
 I2

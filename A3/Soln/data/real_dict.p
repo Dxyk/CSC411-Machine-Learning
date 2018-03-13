@@ -286,7 +286,7 @@ p95
 I1
 sS'china'
 p96
-I37
+I35
 sS'pursuit'
 p97
 I1
@@ -427,7 +427,7 @@ p142
 I5
 sS'call'
 p143
-I31
+I30
 sS'investment'
 p144
 I2
@@ -649,7 +649,7 @@ p216
 I3
 sS'president'
 p217
-I66
+I65
 sS'law'
 p218
 I10
@@ -1315,7 +1315,7 @@ p438
 I2
 sS'the'
 p439
-I173
+I156
 sS'exonerate'
 p440
 I1
@@ -1972,7 +1972,7 @@ p657
 I1
 sS'in'
 p658
-I214
+I213
 sS'victims'
 p659
 I2
@@ -2299,7 +2299,7 @@ p766
 I1
 sS'donald'
 p767
-I829
+I828
 sS'armando'
 p768
 I1
@@ -2335,7 +2335,7 @@ p778
 I5
 sS'for'
 p779
-I174
+I171
 sS'fourth'
 p780
 I1
@@ -2533,7 +2533,7 @@ p844
 I4
 sS'head'
 p845
-I10
+I8
 sS'offer'
 p846
 I4
@@ -2668,7 +2668,7 @@ p889
 I1
 sS'no'
 p890
-I15
+I14
 sS'daca'
 p891
 I7
@@ -3304,7 +3304,7 @@ p1101
 I1
 sS'trump'
 p1102
-I1744
+I1739
 sS'lobbying'
 p1103
 I1
@@ -3862,7 +3862,7 @@ p1287
 I1
 sS'first'
 p1288
-I44
+I43
 sS'wenesday'
 p1289
 I1
@@ -4093,7 +4093,7 @@ p1364
 I4
 sS'and'
 p1365
-I116
+I115
 sS'savages'
 p1366
 I1
@@ -4504,7 +4504,7 @@ p1501
 I3
 sS'un'
 p1502
-I28
+I27
 sS'between'
 p1503
 I8
@@ -4729,7 +4729,7 @@ p1576
 I1
 sS'wants'
 p1577
-I14
+I13
 sS'charlottesville'
 p1578
 I14
@@ -5092,7 +5092,7 @@ p1697
 I1
 sS'tower'
 p1698
-I4
+I3
 sS'robbers'
 p1699
 I1
@@ -5230,7 +5230,7 @@ p1743
 I1
 sS'of'
 p1744
-I186
+I181
 sS'industry'
 p1745
 I3
@@ -5665,7 +5665,7 @@ p1888
 I1
 sS'to'
 p1889
-I413
+I380
 sS'program'
 p1890
 I1
@@ -6202,7 +6202,7 @@ p2067
 I6
 sS'a'
 p2068
-I93
+I92
 sS'short'
 p2069
 I3
@@ -6592,7 +6592,7 @@ p2197
 I1
 sS'major'
 p2198
-I11
+I10
 sS'dont'
 p2199
 I3
@@ -7786,7 +7786,7 @@ p2595
 I59
 sS'run'
 p2596
-I6
+I5
 sS'lose'
 p2597
 I3
@@ -8449,7 +8449,7 @@ p2816
 I1
 sS'punch'
 p2817
-I3
+I2
 sS'eminem'
 p2818
 I2
@@ -8488,7 +8488,7 @@ p2829
 I2
 sS'great'
 p2830
-I9
+I8
 sS'trans'
 p2831
 I1
@@ -8506,7 +8506,7 @@ p2835
 I4
 sS'30'
 p2836
-I2
+I1
 sS'shades'
 p2837
 I1
@@ -8647,7 +8647,7 @@ p2882
 I1
 sS'on'
 p2883
-I205
+I204
 sS'halloween'
 p2884
 I4
@@ -8917,7 +8917,7 @@ p2972
 I1
 sS'own'
 p2973
-I7
+I6
 sS'looks'
 p2974
 I3
@@ -9322,7 +9322,7 @@ p3107
 I1
 sS'neck'
 p3108
-I2
+I1
 sS'steel'
 p3109
 I1
@@ -9751,7 +9751,7 @@ p3250
 I1
 sS'job'
 p3251
-I5
+I4
 sS'navajos'
 p3252
 I2
@@ -9967,7 +9967,7 @@ p3322
 I1
 sS'as'
 p3323
-I82
+I80
 sS'salman'
 p3324
 I1
@@ -10216,7 +10216,7 @@ p3405
 I1
 sS'day'
 p3406
-I12
+I11
 sS'add'
 p3407
 I1
@@ -10321,7 +10321,7 @@ p3440
 I1
 sS'twitter'
 p3441
-I18
+I17
 sS'hail'
 p3442
 I3
@@ -10579,7 +10579,7 @@ p3526
 I4
 sS'he'
 p3527
-I41
+I40
 sS'breakthrough'
 p3528
 I1

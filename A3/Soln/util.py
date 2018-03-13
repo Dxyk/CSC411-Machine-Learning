@@ -11,9 +11,11 @@ CLEAN_FAKE = "./clean_fake.txt"
 
 
 # ==================== Helper Functions ====================
-def construct_word_dict():
+def construct_word_dict(overwrite = False):
     """
     Parse the file and return three dictionaries of words: real, fake and total
+    :param overwrite: the flag that indicates to overwrite the existing data
+    :type overwrite: bool
     :return: three dictionaries of words: real, fake, total
     :rtype: tuple
     """
@@ -22,9 +24,10 @@ def construct_word_dict():
 
     if os.path.isfile("./data/real_dict.p") and \
             os.path.isfile("./data/fake_dict.p") and \
-            os.path.isfile("./data/total_dict.p"):
+            os.path.isfile("./data/total_dict.p") and not overwrite:
         return
 
+    print "========== Constructing Dict =========="
     real_dict, fake_dict, total_dict = {}, {}, {}
 
     # Read through clean_real.txt and fill in dict
@@ -52,6 +55,7 @@ def construct_word_dict():
     pickle.dump(real_dict, open("./data/real_dict.p", "wb"))
     pickle.dump(fake_dict, open("./data/fake_dict.p", "wb"))
     pickle.dump(total_dict, open("./data/total_dict.p", "wb"))
+    print "========== Done Constructing Dict =========="
     return real_dict, fake_dict, total_dict
 
 
@@ -136,11 +140,9 @@ def small_product(num_arr):
     return math.exp(sum(logged_num))
 
 
-def naive_bayes(train_set, train_label, real_dict, fake_dict, test_words, m, p_hat):
+def naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat):
     """
     The naive bayes classifier
-    :param train_set: the training set
-    :type train_set: list
     :param train_label: the training label
     :type train_label: list
     :param test_words: the test list that contains words
@@ -164,12 +166,14 @@ def naive_bayes(train_set, train_label, real_dict, fake_dict, test_words, m, p_h
     real_probs, fake_probs = [], []
     for word, word_count in real_dict.iteritems():
         p_word_given_real = (float(word_count) + m * p_hat) / float(real_count + m)
+
         if word in test_words:
             real_probs.append(p_word_given_real)
         else:
             real_probs.append(1. - p_word_given_real)
     for word, word_count in fake_dict.iteritems():
         p_word_given_fake = (float(word_count) + m * p_hat) / float(fake_count + m)
+
         if word in test_words:
             fake_probs.append(p_word_given_fake)
         else:
@@ -199,7 +203,7 @@ if __name__ == "__main__":
     correct = 0
     for i in range(len(val_set)):
         test_words = val_set[i].split()
-        result = naive_bayes(train_set, train_label, real_dict, fake_dict, test_words, m, p_hat)
+        result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)
         if result == val_label[i]:
             correct += 1
     print float(correct) / float(len(val_label))
