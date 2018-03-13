@@ -129,7 +129,28 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		The dataset contains headlines including the word ``Trump". The quality of the dataset is generally good since there is a large variety of vocabularies included. \\
 		
+		By observing, we can see that the fake news' headlines are generally longer than the real news' headlines. \\
+		
+		Except for ``Donald" and ``Trump", the most frequent words are ``to", ``for", etc, but they do not mean a lot. The top meaningful words in total are ``Clinton", ``election" and ``president".  This infers that most news are regarding the 2017 presidential election and especially between Donald Trump and Hilary Clinton.\\
+		
+		The statistics for the three words are generated through part1 in fake.py and the results are given below in Listing 1. We can see that although ``Clinton" has the largest word count, most of them appear in the fake news. Reports that include ``election" are more likely to be real news. \\
+		
+		\begin{lstlisting}[caption=statistic results]
+		[clinton]:
+			real: 83
+			fake: 132
+			total: 215
+		[election]:
+			real: 87
+			fake: 74
+			total: 161
+		[president]:
+			real: 66
+			fake: 64
+			total: 130
+		\end{lstlisting}
 		
 	\end{homeworkProblem}
 	\clearpage
@@ -141,7 +162,7 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		
+		use set instead of list to avoid situation where word appear twice in headline making the probability negative and the log of it will be negative
 		
 	\end{homeworkProblem}
 	\clearpage
