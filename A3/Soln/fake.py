@@ -52,14 +52,14 @@ def part2(tune = False):
     (train_set, train_label), (val_set, val_label), (test_set, test_label) = sets
     real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
 
-    # TODO: Tuning p too high?
+    # TODO: modify naive bayes: the training result does not make sense
     if tune:
         max_val_performance, max_correct_count = 0, 0
         opt_m, opt_p_hat = 0, 0
 
         print "========== Start Tuning =========="
-        for m in range(1, 20, 2):
-            for p_hat in np.arange(0.1, 1.0, 0.1):
+        for m in [1, 5, 10, 25, 50, 100]:
+            for p_hat in [0.001, 0.01, 0.1, 0.25, 0.5, 0.75]:
                 print "testing on m = {}, p_hat = {}".format(m, p_hat)
                 correct_count = 0
                 for i in range(len(val_set)):
@@ -112,71 +112,88 @@ def part2(tune = False):
     print "validation performance = {}".format(val_performance)
     print "test performance = {}".format(test_performance)
 
-
-
     return
 
 
 # Part 3
-def part3(save = False):
+def part3():
     """
-    Get the top words
-    :param save:
-    :type save:
-    :return:
-    :rtype:
+    Get the top important present and absent words
+    :return: None
+    :rtype: None
     """
+    # Load the word count dicts
     real_dict = pickle.load(open("./data/real_dict.p", "rb"))
     fake_dict = pickle.load(open("./data/fake_dict.p", "rb"))
     real_count = len(real_dict.keys())
     fake_count = len(fake_dict.keys())
+    total_count = real_count + fake_count
 
-    real_influence_dict, fake_influence_dict = {}, {}
+    # Priors
+    p_real = float(real_count) / float(total_count)
+    p_fake = float(fake_count) / float(total_count)
+
+    real_presence_influence_dict, fake_presence_influence_dict = {}, {}
+    real_absence_influence_dict, fake_absence_influence_dict = {}, {}
 
     for word, word_count in real_dict.iteritems():
+        # P(real | word) = P(word | real) P(real) / P(word)
         p_word_given_real = float(word_count) / float(real_count)
-        # Register the influence of the word to real news to the dict
-        real_influence_dict[word] = p_word_given_real
+        p_word = float(word_count) / float(total_count)
+        p_real_given_word = p_word_given_real * p_real / p_word
+
+        real_presence_influence_dict[word] = p_real_given_word
+
+        if word not in fake_dict:
+            # P(fake | not word) = P(not word | fake) P(fake) / P(word)
+            p_not_word_given_fake = float(word_count) / float(fake_count)
+            p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
+            fake_absence_influence_dict[word] = p_fake_given_not_word
 
     for word, word_count in fake_dict.iteritems():
+        # P(fake | word) = P(word | fake) P(fake) / P(word)
         p_word_given_fake = (float(word_count)) / float(fake_count)
-        # Register the influence of the word to fake news to the dict
-        fake_influence_dict[word] = p_word_given_fake
+        p_word = float(word_count) / float(total_count)
+        p_real_given_word = p_word_given_fake * p_fake / p_word
+        fake_presence_influence_dict[word] = p_real_given_word
 
-    if save:
-        pickle.dump(real_influence_dict,
-                    open("./data/real_influence_dict.p", mode = "wb"))
-        pickle.dump(fake_influence_dict,
-                    open("./data/fake_influence_dict.p", mode = "wb"))
+        if word not in real_dict:
+            # P(real | not word) = P(not word | real) P(real) / P(word)
+            p_not_word_given_real = float(word_count) / float(real_count)
+            p_real_given_not_word = p_not_word_given_real * p_real / p_word
+            real_absence_influence_dict[word] = p_real_given_not_word
 
-    sorted_real = sorted(real_influence_dict.items(),
+    sorted_real_presence = sorted(real_presence_influence_dict.items(),
                                    key = operator.itemgetter(1), reverse = True)
-    sorted_fake = sorted(fake_influence_dict.items(),
+    sorted_real_absence = sorted(real_absence_influence_dict.items(),
+                                   key = operator.itemgetter(1), reverse = True)
+    sorted_fake_presence = sorted(fake_presence_influence_dict.items(),
+                                   key = operator.itemgetter(1), reverse = True)
+    sorted_fake_absence = sorted(fake_absence_influence_dict.items(),
                                    key = operator.itemgetter(1), reverse = True)
 
-    top_10_important_real = sorted_real[:10]
-    top_10_unimportant_real = sorted_real[-1:-11:-1]
-    top_10_important_fake = sorted_fake[:10]
-    top_10_unimportant_fake = sorted_fake[-1:-11:-1]
-    print "Real:"
-    print top_10_important_real
-    print top_10_unimportant_real
-    print "Fake:"
-    print top_10_important_fake
-    print top_10_unimportant_fake
+    top_10_real_presence = sorted_real_presence[:10]
+    top_10_real_absence = sorted_real_absence[:10]
+    top_10_fake_presence = sorted_fake_presence[:10]
+    top_10_fake_absence = sorted_fake_absence[:10]
+    print "a:"
+    print "\tReal: "
+    print "\ttop 10 important presence:", [t[0] for t in top_10_real_presence]
+    print "\ttop 10 important absence:", [t[0] for t in top_10_real_absence]
+    print "\tFake:"
+    print "\ttop 10 important presence:", [t[0] for t in top_10_fake_presence]
+    print "\ttop 10 important absence:", [t[0] for t in top_10_fake_absence]
 
-    sorted_real = [tup for tup in sorted_real if tup[0] not in ENGLISH_STOP_WORDS]
-    sorted_fake = [tup for tup in sorted_fake if tup[0] not in ENGLISH_STOP_WORDS]
-    top_10_important_real = sorted_real[:10]
-    top_10_unimportant_real = sorted_real[-1:-11:-1]
-    top_10_important_fake = sorted_fake[:10]
-    top_10_unimportant_fake = sorted_fake[-1:-11:-1]
-    print "\nReal:"
-    print top_10_important_real
-    print top_10_unimportant_real
-    print "Fake:"
-    print top_10_important_fake
-    print top_10_unimportant_fake
+    sorted_real_presence = [tup for tup in sorted_real_presence if tup[0] not in ENGLISH_STOP_WORDS]
+    sorted_fake_presence = [tup for tup in sorted_fake_presence if tup[0] not in ENGLISH_STOP_WORDS]
+    top_10_real_presence = sorted_real_presence[:10]
+    top_10_fake_presence = sorted_fake_presence[:10]
+    print "\nb:"
+    print "\tReal: "
+    print "\ttop 10 important presence:", [t[0] for t in top_10_real_presence]
+    print "\tFake:"
+    print "\ttop 10 important presence:", [t[0] for t in top_10_fake_presence]
+
     return
 
 
@@ -208,7 +225,7 @@ def part8():
 if __name__ == "__main__":
     # construct_word_dict(overwrite = False)
     # part1(print_dict = False)
-    # part2(tune = False)
+    # part2(tune = True)
     part3()
     # part4()
     # part5()
