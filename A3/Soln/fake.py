@@ -41,7 +41,7 @@ def part1(print_dict = False):
 # Part 2
 def part2(tune = False):
     """
-    Perform naive bayes and tune the parameters m and p_hat
+    Perform naive bayes, tune the parameters m and p_hat and report the results.
     :param tune: flag for tuning the parameters
     :type tune: bool
     :return: None
@@ -58,8 +58,8 @@ def part2(tune = False):
         opt_m, opt_p_hat = 0, 0
 
         print "========== Start Tuning =========="
-        for m in [1, 5, 10, 25, 50, 100]:
-            for p_hat in [0.001, 0.01, 0.1, 0.25, 0.5, 0.75]:
+        for m in range(1, 10):
+            for p_hat in np.arange(0.05, 1.0, 0.1):
                 print "testing on m = {}, p_hat = {}".format(m, p_hat)
                 correct_count = 0
                 for i in range(len(val_set)):
@@ -68,6 +68,7 @@ def part2(tune = False):
                     if result == val_label[i]:
                         correct_count += 1
                 performance = float(correct_count) / float(len(val_set))
+                print "Performance: {} ({})".format(performance, correct_count)
                 if performance > max_val_performance:
                     print "new best performance: {} ({})".format(performance, correct_count)
                     opt_m, opt_p_hat = m, p_hat
@@ -225,8 +226,8 @@ def part8():
 if __name__ == "__main__":
     # construct_word_dict(overwrite = False)
     # part1(print_dict = False)
-    # part2(tune = True)
-    part3()
+    part2(tune = True)
+    # part3()
     # part4()
     # part5()
     # part6()
