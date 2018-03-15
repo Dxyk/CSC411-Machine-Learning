@@ -162,9 +162,17 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		use set instead of list to avoid situation where word appear twice in headline making the probability negative and the log of it will be negative
+		The Naive Bayes algorithm is implemented in naive\_bayes in util.py. To tune the parameters $m$ and $\hat{p}$, we try using naive bayes on different value of $m$ and $\hat{p}$ and pick one that has the best performance on the validation set. The range of test values for $m$ was from 1 to 10, and for $\hat{p}$ was from 0.05 to 0.95. The returned optimum values were $m = 1$ and $\hat{p} = 0.05$.\\
 		
-		First tried m from 1 to 10 and $p_hat $ from 0.05 - 1, but best value is m = 9 and p = 0.95, then tried m from 1 to 20 and p from 0.05 - 1, then m = 15, p = 0.95
+		To deal with small multiplication, a small\_product function was implemented in util.py. It takes in a list of small values and uses the fact that $\prod \limits_{i = 1}^{N} a_i = \exp (\sum \limits_{i = 1}^{N} \log(a_i))$ to compute the value of $p(a_1, a_2, \dots, a_n) = p(a_1) p(a_2) \dots p(a_1)$\\
+		
+		The performance on training set, validation set and test set is given below:
+		
+		\begin{lstlisting}[caption = Performance]
+	train performance = 0.954108391608
+	validation performance = 0.78936605317
+	test performance = 0.775051124744
+		\end{lstlisting}
 		
 	\end{homeworkProblem}
 	\clearpage
@@ -180,35 +188,38 @@
 		
 		$P(c | word) = \dfrac{P(word | c) \times P(c)}{P(words)}$ where \\$P(c) = \dfrac{count(c)}{count(total)}$, $P(word | c) = \dfrac{count(word\ in\ c)}{count(c)}$ and $P(word) = \dfrac{count(word\ in\ c)}{count(total)}$\\
 		
-		$P(c | not\ word)$ follows the similar calculations.\\
+		$P(c | not\ word)$ follows with similar calculations.\\
 		
-		The most important presence for predicting a class means $P(c | word)$ must be high and the most important absence for predicting a class means $P(c | not\ word)$ must be high.
-		\begin{lstlisting}
+		The most important presence for predicting a class means $P(c | word)$ must be high and the most important absence for predicting a class means $P(c | not\ word)$ must be high.\\
+		
+		After removing the stop words like ``be",  we get the results in b.
+		
+		
+		\begin{lstlisting}[caption = top results]
 	a:
 	Real: 
 	top 10 important presence: 
-		['be', 'pardon', 'felt', 'four', 'protest', 'asian', 
-		'aides', 'liar', 'hate', 'marching']
+		['trump', 'donald', 'to', 'us', 'trumps', 'in', 'on', 
+		'of', 'says', 'for']
 	top 10 important absence: 
-		['hats', 'pide', 'hath', 'sleep', 'deri', 'hating', 
-		'captain', 'saved', 'assembled', 'kommonsentsjane']
+		['kommonsentsjane', 'lord', 'tired', 'miller', '270',
+		 'elegant', 'battleground', 'fingers', 'salbuch', 'cult']
 	Fake:
 	top 10 important presence: 
-		['nobel', 'hats', 'pide', 'colleges', 'four', 'hath', 
-		'sleep', 'deri', 'hating', 'captain']
+		['trump', 'to', 'the', 'donald', 'in', 'of', 'for', 'a', 'and', 'on']
 	top 10 important absence: 
-		['manaforts', 'asian', 'aides', 'marching', 'stinks',
-		 'protections', 'kidman', 'sorry', 'whack', 'softener']
+		['hanging', 'marching', 'regional', 'hearin', 'piling', 
+		'jennett', 'loathing', 'deferred', 'decry', 'lgbt']
 	
 	b:
 	Real: 
 	top 10 important presence: 
-		['pardon', 'felt', 'protest', 'asian', 'aides', 'liar', 
-		'hate', 'marching', 'stinks', 'votes']
+		['trump', 'donald', 'trumps', 'says', 'election', 
+		'clinton', 'north', 'korea', 'ban', 'president']
 	Fake:
 	top 10 important presence: 
-		['nobel', 'hats', 'pide', 'colleges', 'hath', 'sleep', 
-		'deri', 'hating', 'captain', 'hate']
+		['trump', 'donald', 'hillary', 'clinton', 'election', 
+		'just', 'new', 'president', 'obama', 'america']
 		
 		\end{lstlisting}
 		

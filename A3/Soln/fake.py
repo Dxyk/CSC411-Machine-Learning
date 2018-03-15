@@ -39,7 +39,7 @@ def part1(print_dict = False):
 
 
 # Part 2
-def part2(tune = False):
+def part2(tune = True):
     """
     Perform naive bayes, tune the parameters m and p_hat and report the results.
     :param tune: flag for tuning the parameters
@@ -52,7 +52,6 @@ def part2(tune = False):
     (train_set, train_label), (val_set, val_label), (test_set, test_label) = sets
     real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
 
-    # TODO: modify naive bayes: the training result does not make sense
     if tune:
         max_val_performance, max_correct_count = 0, 0
         opt_m, opt_p_hat = 0, 0
@@ -123,46 +122,134 @@ def part3():
     :return: None
     :rtype: None
     """
+    # Load m and p_hat
+    m, p_hat = pickle.load(open("./data/nb_mp_hat.p", mode = "rb"))
+
     # Load the word count dicts
     real_dict = pickle.load(open("./data/real_dict.p", "rb"))
     fake_dict = pickle.load(open("./data/fake_dict.p", "rb"))
+    total_dict = pickle.load(open("./data/total_dict.p", "rb"))
     real_count = len(real_dict.keys())
+    real_word_count = sum(real_dict.values())
     fake_count = len(fake_dict.keys())
+    fake_word_count = sum(fake_dict.values())
     total_count = real_count + fake_count
+    # total_count = len(total_dict.keys())
+    total_word_count = sum(total_dict.values())
+
+    print "total real count:", real_count
+    print "total fake count:", fake_count
+    print "total count:", total_count
+    print "total word count: ", total_word_count
+
 
     # Priors
     p_real = float(real_count) / float(total_count)
     p_fake = float(fake_count) / float(total_count)
 
+    print "p(real): ", p_real
+    print "p(fake): ", p_fake
+    print "===================="
+
     real_presence_influence_dict, fake_presence_influence_dict = {}, {}
     real_absence_influence_dict, fake_absence_influence_dict = {}, {}
 
-    for word, word_count in real_dict.iteritems():
+    for word in total_dict.keys():
+        if word in real_dict.keys():
+            word_real_count = real_dict[word]
+        else:
+            word_real_count = 0
+        if word in fake_dict.keys():
+            word_fake_count = fake_dict[word]
+        else:
+            word_fake_count = 0
+        # p_word = float(total_dict[word]) / float(total_word_count)
+        # TODO: results are not right when we add p(word) to the calculations, why?
+        p_word = 1
         # P(real | word) = P(word | real) P(real) / P(word)
-        p_word_given_real = float(word_count) / float(real_count)
-        p_word = float(word_count) / float(total_count)
+        p_word_given_real = float(word_real_count + m * p_hat) / float(real_count + m)
         p_real_given_word = p_word_given_real * p_real / p_word
-
         real_presence_influence_dict[word] = p_real_given_word
+        if p_real_given_word > 1 or p_real_given_word < 0:
+            print word
+            print "total:", total_dict[word]
+            print "real count:", word_real_count
+            print "fake count:", word_fake_count
+            print "P(word | real):", p_word_given_real
+            print "P(real):", p_real
+            print "P(word):", p_word
+            print "P(real | word):", p_real_given_word
+            break
 
-        if word not in fake_dict:
-            # P(fake | not word) = P(not word | fake) P(fake) / P(word)
-            p_not_word_given_fake = float(word_count) / float(fake_count)
-            p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
-            fake_absence_influence_dict[word] = p_fake_given_not_word
 
-    for word, word_count in fake_dict.iteritems():
+        # P(real | not word) = P(not word | real) P(real) / P(word)
+        p_not_word_given_real = float(real_count - word_real_count + m * p_hat) / float(real_count + m)
+        p_real_given_not_word = p_not_word_given_real * p_real / p_word
+        real_absence_influence_dict[word] = p_real_given_not_word
+
         # P(fake | word) = P(word | fake) P(fake) / P(word)
-        p_word_given_fake = (float(word_count)) / float(fake_count)
-        p_word = float(word_count) / float(total_count)
-        p_real_given_word = p_word_given_fake * p_fake / p_word
-        fake_presence_influence_dict[word] = p_real_given_word
+        p_word_given_fake = float(word_fake_count + m * p_hat) / float(fake_count + m)
+        p_fake_given_word = p_word_given_fake * p_fake / p_word
+        fake_presence_influence_dict[word] = p_fake_given_word
 
-        if word not in real_dict:
-            # P(real | not word) = P(not word | real) P(real) / P(word)
-            p_not_word_given_real = float(word_count) / float(real_count)
-            p_real_given_not_word = p_not_word_given_real * p_real / p_word
-            real_absence_influence_dict[word] = p_real_given_not_word
+        # P(fake | not word) = P(not word | fake) P(fake) / P(word)
+        p_not_word_given_fake = float(fake_count - word_fake_count + m * p_hat) / float(fake_count + m)
+        p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
+        fake_absence_influence_dict[word] = p_fake_given_not_word
+
+
+    #     if word in real_dict.keys():
+    #         # P(real | word) = P(word | real) P(real) / P(word)
+    #         # p_word_given_real = float(real_dict[word]) / float(real_count)
+    #         p_word_given_real = float(real_dict[word] + m * p_hat) / float(real_count + m)
+    #         p_real_given_word = p_word_given_real * p_real / p_word
+    #         real_presence_influence_dict[word] = p_real_given_word
+    #     else:
+    #         # P(real | not word) = P(not word | real) P(real) / P(word)
+    #         # p_not_word_given_real = float(total_dict[word]) / float(real_count)
+    #         p_not_word_given_real = float(real_count - total_dict[word] + m * p_hat) / float(real_count + m)
+    #         p_real_given_not_word = p_not_word_given_real * p_real / p_word
+    #         real_absence_influence_dict[word] = p_real_given_not_word
+    #     if word in fake_dict.keys():
+    #         # P(fake | word) = P(word | fake) P(fake) / P(word)
+    #         # p_word_given_fake = float(fake_dict[word]) / float(fake_count)
+    #         p_word_given_fake = float(fake_dict[word] + m * p_hat) / float(fake_count + m)
+    #         p_fake_given_word = p_word_given_fake * p_fake / p_word
+    #         fake_presence_influence_dict[word] = p_fake_given_word
+    #     else:
+    #         # P(fake | not word) = P(not word | fake) P(fake) / P(word)
+    #         # p_not_word_given_fake = float(total_dict[word]) / float(fake_count)
+    #         p_not_word_given_fake = float(fake_count - total_dict[word] + m * p_hat) / float(fake_count + m)
+    #         p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
+    #         fake_absence_influence_dict[word] = p_fake_given_not_word
+    #
+    #
+    # # for word, word_count in real_dict.iteritems():
+    # #     # P(real | word) = P(word | real) P(real) / P(word)
+    # #     p_word_given_real = float(word_count) / float(real_count)
+    # #     p_word = float(word_count) / float(total_count)
+    # #     p_real_given_word = p_word_given_real * p_real / p_word
+    # #
+    # #     real_presence_influence_dict[word] = p_real_given_word
+    # #
+    # #     if word not in fake_dict:
+    # #         # P(fake | not word) = P(not word | fake) P(fake) / P(word)
+    # #         p_not_word_given_fake = float(word_count) / float(fake_count)
+    # #         p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
+    # #         fake_absence_influence_dict[word] = p_fake_given_not_word
+    # #
+    # # for word, word_count in fake_dict.iteritems():
+    # #     # P(fake | word) = P(word | fake) P(fake) / P(word)
+    # #     p_word_given_fake = (float(word_count)) / float(fake_count)
+    # #     p_word = float(word_count) / float(total_count)
+    # #     p_real_given_word = p_word_given_fake * p_fake / p_word
+    # #     fake_presence_influence_dict[word] = p_real_given_word
+    # #
+    # #     if word not in real_dict:
+    # #         # P(real | not word) = P(not word | real) P(real) / P(word)
+    # #         p_not_word_given_real = float(word_count) / float(real_count)
+    # #         p_real_given_not_word = p_not_word_given_real * p_real / p_word
+    # #         real_absence_influence_dict[word] = p_real_given_not_word
 
     sorted_real_presence = sorted(real_presence_influence_dict.items(),
                                    key = operator.itemgetter(1), reverse = True)
@@ -224,10 +311,10 @@ def part8():
 
 
 if __name__ == "__main__":
-    # construct_word_dict(overwrite = False)
+    # construct_word_dict(overwrite = True)
     # part1(print_dict = False)
-    part2(tune = True)
-    # part3()
+    # part2(tune = True)
+    part3()
     # part4()
     # part5()
     # part6()
