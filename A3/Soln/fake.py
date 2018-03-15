@@ -116,9 +116,12 @@ def part2(tune = True):
 
 
 # Part 3
-def part3():
+def part3(debug = False):
     """
     Get the top important present and absent words
+
+    :param debug: Debugging flag
+    :type debug: bool
     :return: None
     :rtype: None
     """
@@ -137,19 +140,20 @@ def part3():
     # total_count = len(total_dict.keys())
     total_word_count = sum(total_dict.values())
 
-    print "total real count:", real_count
-    print "total fake count:", fake_count
-    print "total count:", total_count
-    print "total word count: ", total_word_count
 
 
     # Priors
     p_real = float(real_count) / float(total_count)
     p_fake = float(fake_count) / float(total_count)
 
-    print "p(real): ", p_real
-    print "p(fake): ", p_fake
-    print "===================="
+    if debug:
+        print "total real count:", real_count
+        print "total fake count:", fake_count
+        print "total count:", total_count
+        print "total word count: ", total_word_count
+        print "p(real): ", p_real
+        print "p(fake): ", p_fake
+        print "===================="
 
     real_presence_influence_dict, fake_presence_influence_dict = {}, {}
     real_absence_influence_dict, fake_absence_influence_dict = {}, {}
@@ -170,17 +174,6 @@ def part3():
         p_word_given_real = float(word_real_count + m * p_hat) / float(real_count + m)
         p_real_given_word = p_word_given_real * p_real / p_word
         real_presence_influence_dict[word] = p_real_given_word
-        if p_real_given_word > 1 or p_real_given_word < 0:
-            print word
-            print "total:", total_dict[word]
-            print "real count:", word_real_count
-            print "fake count:", word_fake_count
-            print "P(word | real):", p_word_given_real
-            print "P(real):", p_real
-            print "P(word):", p_word
-            print "P(real | word):", p_real_given_word
-            break
-
 
         # P(real | not word) = P(not word | real) P(real) / P(word)
         p_not_word_given_real = float(real_count - word_real_count + m * p_hat) / float(real_count + m)
@@ -197,59 +190,16 @@ def part3():
         p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
         fake_absence_influence_dict[word] = p_fake_given_not_word
 
-
-    #     if word in real_dict.keys():
-    #         # P(real | word) = P(word | real) P(real) / P(word)
-    #         # p_word_given_real = float(real_dict[word]) / float(real_count)
-    #         p_word_given_real = float(real_dict[word] + m * p_hat) / float(real_count + m)
-    #         p_real_given_word = p_word_given_real * p_real / p_word
-    #         real_presence_influence_dict[word] = p_real_given_word
-    #     else:
-    #         # P(real | not word) = P(not word | real) P(real) / P(word)
-    #         # p_not_word_given_real = float(total_dict[word]) / float(real_count)
-    #         p_not_word_given_real = float(real_count - total_dict[word] + m * p_hat) / float(real_count + m)
-    #         p_real_given_not_word = p_not_word_given_real * p_real / p_word
-    #         real_absence_influence_dict[word] = p_real_given_not_word
-    #     if word in fake_dict.keys():
-    #         # P(fake | word) = P(word | fake) P(fake) / P(word)
-    #         # p_word_given_fake = float(fake_dict[word]) / float(fake_count)
-    #         p_word_given_fake = float(fake_dict[word] + m * p_hat) / float(fake_count + m)
-    #         p_fake_given_word = p_word_given_fake * p_fake / p_word
-    #         fake_presence_influence_dict[word] = p_fake_given_word
-    #     else:
-    #         # P(fake | not word) = P(not word | fake) P(fake) / P(word)
-    #         # p_not_word_given_fake = float(total_dict[word]) / float(fake_count)
-    #         p_not_word_given_fake = float(fake_count - total_dict[word] + m * p_hat) / float(fake_count + m)
-    #         p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
-    #         fake_absence_influence_dict[word] = p_fake_given_not_word
-    #
-    #
-    # # for word, word_count in real_dict.iteritems():
-    # #     # P(real | word) = P(word | real) P(real) / P(word)
-    # #     p_word_given_real = float(word_count) / float(real_count)
-    # #     p_word = float(word_count) / float(total_count)
-    # #     p_real_given_word = p_word_given_real * p_real / p_word
-    # #
-    # #     real_presence_influence_dict[word] = p_real_given_word
-    # #
-    # #     if word not in fake_dict:
-    # #         # P(fake | not word) = P(not word | fake) P(fake) / P(word)
-    # #         p_not_word_given_fake = float(word_count) / float(fake_count)
-    # #         p_fake_given_not_word = p_not_word_given_fake * p_fake / p_word
-    # #         fake_absence_influence_dict[word] = p_fake_given_not_word
-    # #
-    # # for word, word_count in fake_dict.iteritems():
-    # #     # P(fake | word) = P(word | fake) P(fake) / P(word)
-    # #     p_word_given_fake = (float(word_count)) / float(fake_count)
-    # #     p_word = float(word_count) / float(total_count)
-    # #     p_real_given_word = p_word_given_fake * p_fake / p_word
-    # #     fake_presence_influence_dict[word] = p_real_given_word
-    # #
-    # #     if word not in real_dict:
-    # #         # P(real | not word) = P(not word | real) P(real) / P(word)
-    # #         p_not_word_given_real = float(word_count) / float(real_count)
-    # #         p_real_given_not_word = p_not_word_given_real * p_real / p_word
-    # #         real_absence_influence_dict[word] = p_real_given_not_word
+        if debug and p_real_given_word > 1 or p_real_given_word < 0:
+            print word
+            print "total:", total_dict[word]
+            print "real count:", word_real_count
+            print "fake count:", word_fake_count
+            print "P(word | real):", p_word_given_real
+            print "P(real):", p_real
+            print "P(word):", p_word
+            print "P(real | word):", p_real_given_word
+            break
 
     sorted_real_presence = sorted(real_presence_influence_dict.items(),
                                    key = operator.itemgetter(1), reverse = True)

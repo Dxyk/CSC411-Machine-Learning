@@ -184,17 +184,23 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		The results are produced by part3 in fake.py and are listed below. \\
-		
-		$P(c | word) = \dfrac{P(word | c) \times P(c)}{P(words)}$ where \\$P(c) = \dfrac{count(c)}{count(total)}$, $P(word | c) = \dfrac{count(word\ in\ c)}{count(c)}$ and $P(word) = \dfrac{count(word\ in\ c)}{count(total)}$\\
-		
-		$P(c | not\ word)$ follows with similar calculations.\\
-		
-		The most important presence for predicting a class means $P(c | word)$ must be high and the most important absence for predicting a class means $P(c | not\ word)$ must be high.\\
-		
-		After removing the stop words like ``be",  we get the results in b.
-		
-		
+		\begin{enumerate}
+			\item 
+			The results are produced by part3 in fake.py and are listed below. \\
+			
+			$P(c | word) = \dfrac{P(word | c) \times P(c)}{P(words)}$ where \\$P(c) = \dfrac{count(c)}{count(total)}$, $P(word | c) = \dfrac{count(word\ in\ c)}{count(c)}$ and $P(word) = \dfrac{count(word\ in\ c)}{count(total)}$\\
+			
+			$P(c | not\ word)$ follows with similar calculations.\\
+			
+			The most important presence for predicting a class means $P(c | word)$ must be high and the most important absence for predicting a class means $P(c | not\ word)$ must be high.\\
+			
+			\item 
+			After removing the stop words like ``be",  we get the results in b.
+			
+			\item 
+			
+		\end{enumerate}
+	
 		\begin{lstlisting}[caption = top results]
 	a:
 	Real: 
