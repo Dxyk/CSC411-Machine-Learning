@@ -1,0 +1,307 @@
+%------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage{fancyhdr} % Required for custom headers
+\usepackage{lastpage} % Required to determine the last page for the footer
+\usepackage{extramarks} % Required for headers and footers
+\usepackage[usenames,dvipsnames]{color} % Required for custom colors
+\usepackage{graphicx} % Required to insert images
+\usepackage{subcaption}
+\usepackage{listings} % Required for insertion of code
+\usepackage{courier} % Required for the courier font
+% Optional Packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1} % Line spacing
+
+% Set up the header and footer
+\pagestyle{fancy}
+\lhead{\hmwkAuthorName} % Top left header
+\chead{\hmwkClass\ : \hmwkTitle} % Top center head
+%\rhead{\firstxmark} % Top right header
+\lfoot{\lastxmark} % Bottom left footer
+\cfoot{} % Bottom center footer
+\rfoot{Page\ \thepage\ of\ \protect\pageref{LastPage}} % Bottom right footer
+\renewcommand\headrulewidth{0.4pt} % Size of the header rule
+\renewcommand\footrulewidth{0.4pt} % Size of the footer rule
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+
+%------------------------------------------------------------------------------------
+%	DOCUMENT STRUCTURE COMMANDS
+%	Skip this unless you know what you're doing
+%------------------------------------------------------------------------------------
+
+% Header and footer for when a page split occurs within a problem environment
+\newcommand{\enterProblemHeader}[1]{
+	%\nobreak\extramarks{#1}{#1 continued on next page\ldots}\nobreak
+	%\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak
+}
+
+% Header and footer for when a page split occurs between problem environments
+\newcommand{\exitProblemHeader}[1]{
+	%\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak
+	%\nobreak\extramarks{#1}{}\nobreak
+}
+
+\setcounter{secnumdepth}{0} % Removes default section numbers
+\newcounter{homeworkProblemCounter} % Creates a counter to keep track of the number of problems
+\setcounter{homeworkProblemCounter}{0}
+
+\newcommand{\homeworkProblemName}{}
+\newenvironment{homeworkProblem}[1][Problem \arabic{homeworkProblemCounter}]{ % Makes a new environment called homeworkProblem which takes 1 argument (custom name) but the default is "Problem #"
+	\stepcounter{homeworkProblemCounter} % Increase counter for number of problems
+	\renewcommand{\homeworkProblemName}{#1} % Assign \homeworkProblemName the name of the problem
+	\section{\homeworkProblemName} % Make a section in the document with the custom problem count
+	\enterProblemHeader{\homeworkProblemName} % Header and footer within the environment
+}{
+	\exitProblemHeader{\homeworkProblemName} % Header and footer after the environment
+}
+
+\newcommand{\problemAnswer}[1]{ % Defines the problem answer command with the content as the only argument
+	\noindent\framebox[\columnwidth][c]{\begin{minipage}{0.98\columnwidth}#1\end{minipage}} % Makes the box around the problem answer and puts the content inside
+}
+
+\newcommand{\homeworkSectionName}{}
+\newenvironment{homeworkSection}[1]{ % New environment for sections within homework problems, takes 1 argument - the name of the section
+	\renewcommand{\homeworkSectionName}{#1} % Assign \homeworkSectionName to the name of the section from the environment argument
+	\subsection{\homeworkSectionName} % Make a subsection with the custom name of the subsection
+	\enterProblemHeader{\homeworkProblemName\ [\homeworkSectionName]} % Header and footer within the environment
+}{
+	\enterProblemHeader{\homeworkProblemName} % Header and footer after the environment
+}
+
+
+%=================================================================
+
+%------------------------------------------------------------------------------------
+%	NAME AND CLASS SECTION
+%------------------------------------------------------------------------------------
+
+\newcommand{\hmwkTitle}{Assignment\ \#3} % Assignment title
+\newcommand{\hmwkClass}{CSC 411} % Course/class
+\newcommand{\hmwkAuthorName}{Xiangyu Kong \hspace{3em} Yun Lu} % Your name
+\newcommand{\hmwkUTorId}{kongxi16 \hspace{5em} luyun5} % UTorID
+
+%------------------------------------------------------------------------------------
+%	TITLE PAGE
+%------------------------------------------------------------------------------------
+
+\title{
+	\vspace{2in}
+	\textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+	%	\normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate}\\
+	\vspace{0.1in}
+	\vspace{3in}
+}
+
+\author{\textbf{\hmwkAuthorName} \\ \textbf{\hmwkUTorId}}
+
+% Insert date here if you want it to appear below your name
+\date{\today}
+
+%------------------------------------------------------------------------------------
+
+\begin{document}
+	
+	\maketitle
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 1
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		The dataset contains headlines including the word ``Trump". The quality of the dataset is generally good since there is a large variety of vocabularies included. \\
+		
+		By observing, we can see that the fake news' headlines are generally longer than the real news' headlines. \\
+		
+		Except for ``Donald" and ``Trump", the most frequent words are ``to", ``for", etc, but they do not mean a lot. The top meaningful words in total are ``Clinton", ``election" and ``president".  This infers that most news are regarding the 2017 presidential election and especially between Donald Trump and Hilary Clinton.\\
+		
+		The statistics for the three words are generated through part1 in fake.py and the results are given below in Listing 1. We can see that although ``Clinton" has the largest word count, most of them appear in the fake news. Reports that include ``election" are more likely to be real news. \\
+		
+		\begin{lstlisting}[caption=statistic results]
+		[clinton]:
+			real: 83
+			fake: 132
+			total: 215
+		[election]:
+			real: 87
+			fake: 74
+			total: 161
+		[president]:
+			real: 66
+			fake: 64
+			total: 130
+		\end{lstlisting}
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+	
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 2
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		The Naive Bayes algorithm is implemented in naive\_bayes in util.py. To tune the parameters $m$ and $\hat{p}$, we try using naive bayes on different value of $m$ and $\hat{p}$ and pick one that has the best performance on the validation set. The range of test values for $m$ was from 1 to 10, and for $\hat{p}$ was from 0.05 to 0.95. The returned optimum values were $m = 1$ and $\hat{p} = 0.05$.\\
+		
+		To deal with small multiplication, a small\_product function was implemented in util.py. It takes in a list of small values and uses the fact that $\prod \limits_{i = 1}^{N} a_i = \exp (\sum \limits_{i = 1}^{N} \log(a_i))$ to compute the value of $p(a_1, a_2, \dots, a_n) = p(a_1) p(a_2) \dots p(a_1)$\\
+		
+		The performance on training set, validation set and test set is given below:
+		
+		\begin{lstlisting}[caption = Performance]
+	train performance = 0.954108391608
+	validation performance = 0.78936605317
+	test performance = 0.775051124744
+		\end{lstlisting}
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 3
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		\begin{enumerate}
+			\item 
+			The results are produced by part3 in fake.py and are listed below. \\
+			
+			$P(c | word) = \dfrac{P(word | c) \times P(c)}{P(words)}$ where \\$P(c) = \dfrac{count(c)}{count(total)}$, $P(word | c) = \dfrac{count(word\ in\ c)}{count(c)}$ and $P(word) = \dfrac{count(word\ in\ c)}{count(total)}$\\
+			
+			$P(c | not\ word)$ follows with similar calculations.\\
+			
+			The most important presence for predicting a class means $P(c | word)$ must be high and the most important absence for predicting a class means $P(c | not\ word)$ must be high.\\
+			
+			\item 
+			After removing the stop words like ``to", ``us", ``in", and etc,  we get the results in b.
+			
+			\item 
+			The stop words are very likely to appear no matter what class the headline is, so including them will not mean a lot.
+		\end{enumerate}
+	
+		\begin{lstlisting}[caption = top results]
+	a:
+	Real: 
+	top 10 important presence: 
+		['trump', 'donald', 'to', 'us', 'trumps', 'in', 'on', 
+		'of', 'says', 'for']
+	top 10 important absence: 
+		['kommonsentsjane', 'lord', 'tired', 'miller', '270',
+		 'elegant', 'battleground', 'fingers', 'salbuch', 'cult']
+	Fake:
+	top 10 important presence: 
+		['trump', 'to', 'the', 'donald', 'in', 'of', 'for', 'a', 'and', 'on']
+	top 10 important absence: 
+		['hanging', 'marching', 'regional', 'hearin', 'piling', 
+		'jennett', 'loathing', 'deferred', 'decry', 'lgbt']
+	
+	b:
+	Real: 
+	top 10 important presence: 
+		['trump', 'donald', 'trumps', 'says', 'election', 
+		'clinton', 'north', 'korea', 'ban', 'president']
+	Fake:
+	top 10 important presence: 
+		['trump', 'donald', 'hillary', 'clinton', 'election', 
+		'just', 'new', 'president', 'obama', 'america']
+		
+		\end{lstlisting}
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 4
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		The logistic regression is implemented in logistic\_regression.py. The parameters $\alpha$ and $\lambda$ are selected using the similar method as in Problem 2. The two parameters were assigned to various values and the optimum value is the pair where the validation set performs the best. The final $\alpha = 0.0001$ and $\lambda = 0.001$.
+		
+		Using this pair of parameters, the final logistic regression model gives the learning curve as in Fig.\ref{fig:4.1}. 
+		
+		\begin{figure}[!ht]
+			\centering
+			\includegraphics[width=.75\linewidth]{images/4/learning_curve.png}
+			\caption{caption}
+			\label{fig:4.1}
+		\end{figure}
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 5
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		
+		For Naive Bayes, $\theta_0 = P(c)$, and $\theta_i = P(w_i , c)$ and $I_i(x) = \dfrac{1}{P(w_i)}$. The calculated result is $\dfrac{P(c | w_i)}{P(w_i)} $ but $w_i$ does not matter here so when the calculated value is greater than a threshold, we can say that the word combination is likely to produce a real or fake headline.\\
+		
+		For Logistic Regression, $\theta_i$s are the weights in the network. $I_i$s are the identity function that indicates whether the word $w_i$ is present. If the calculated output is greater than a specific threshold, then the output will be real.
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 6
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 7
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+		
+	%---------------------------------------------------------------------------------
+	%	PROBLEM 8
+	%---------------------------------------------------------------------------------
+	\begin{homeworkProblem}
+		%		\noindent \textit{Question}
+		
+		
+	\end{homeworkProblem}
+	\clearpage
+	
+	%---------------------------------------------------------------------------------
+\end{document}
