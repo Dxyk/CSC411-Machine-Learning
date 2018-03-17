@@ -1,7 +1,7 @@
 from util import *
-
-import operator
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+import operator
+import matplotlib.pyplot as plt
 
 
 # ==================== Answers ====================
@@ -304,7 +304,11 @@ def part5():
 
 # Part 6
 def part6():
-    pass
+    theta = pickle.load(open("./data/trained_lr_weight.p", mode = "rb"))
+    word_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
+    word_map = sorted(word_dict.keys())
+
+
 
 
 # Part 7
@@ -323,7 +327,7 @@ if __name__ == "__main__":
     # part1(print_dict = False)
     # part2(tune = True)
     # part3(debug = False)
-    part4(tune = True)
+    part4(tune = False)
     # part5()
     # part6()
     # part7()

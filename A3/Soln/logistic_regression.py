@@ -2,7 +2,7 @@ from util import *
 
 import numpy as np
 from numpy.linalg import *
-import matplotlib.pyplot as plt
+import pickle
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 

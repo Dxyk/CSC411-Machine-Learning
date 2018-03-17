@@ -239,7 +239,16 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		The logistic regression is implemented in logistic\_regression.py. The parameters $\alpha$ and $\lambda$ are selected using the similar method as in Problem 2. The two parameters were assigned to various values and the optimum value is the pair where the validation set performs the best. The final $\alpha = 0.0001$ and $\lambda = 0.001$.
 		
+		Using this pair of parameters, the final logistic regression model gives the learning curve as in Fig.\ref{fig:4.1}. 
+		
+		\begin{figure}[!ht]
+			\centering
+			\includegraphics[width=.75\linewidth]{images/4/learning_curve.png}
+			\caption{caption}
+			\label{fig:4.1}
+		\end{figure}
 		
 	\end{homeworkProblem}
 	\clearpage
@@ -250,8 +259,10 @@
 	%	PROBLEM 5
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
 		
+		For Naive Bayes, $\theta_0 = P(c)$, and $\theta_i = P(w_i , c)$ and $I_i(x) = \dfrac{1}{P(w_i)}$. The calculated result is $\dfrac{P(c | w_i)}{P(w_i)} $ but $w_i$ does not matter here so when the calculated value is greater than a threshold, we can say that the word combination is likely to produce a real or fake headline.\\
+		
+		For Logistic Regression, $\theta_i$s are the weights in the network. $I_i$s are the identity function that indicates whether the word $w_i$ is present. If the calculated output is greater than a specific threshold, then the output will be real.
 		
 	\end{homeworkProblem}
 	\clearpage
