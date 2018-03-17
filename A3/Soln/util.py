@@ -1,17 +1,25 @@
+from naive_bayes import *
+from logistic_regression import *
+
 import numpy as np
-import math
 import os
 import pickle
-import random
 
 
 # ==================== Constants ====================
 CLEAN_REAL = "./clean_real.txt"
 CLEAN_FAKE = "./clean_fake.txt"
 
+TRAIN_SET = "train_set"
+TRAIN_LABEL = "train_label"
+VAL_SET = "val_set"
+VAL_LABEL = "val_label"
+TEST_SET = "test_set"
+TEST_LABEL = "test_label"
+
 
 # ==================== Helper Functions ====================
-def construct_word_dict(overwrite = False):
+def construct_file_word_dict(overwrite = False):
     """
     Parse the file and return three dictionaries of words: real, fake and total
     :param overwrite: the flag that indicates to overwrite the existing data
@@ -59,20 +67,27 @@ def construct_word_dict(overwrite = False):
     return real_dict, fake_dict, total_dict
 
 
-def separate_sets(seed = 0):
+def separate_sets(seed = 0, overwrite = False):
     """
     Separate the two files of headlines into 70:15:15 of training, validation and
     test sets
     :param seed: The random seed
     :type seed: int
-    :return: A tuple containing two tuples of real and fake sets
-    :rtype: tuple
+    :param overwrite: Flag to overwrite the existing file
+    :type overwrite: bool
+    :return: A dict containing real and fake training, val, test sets
+    :rtype: dict
     """
-    random.seed(seed)
+    np.random.seed(seed)
+    sets = {}
+
+    if not overwrite and os.path.isfile("./data/sets.p"):
+        sets = pickle.load(open("./data/sets.p", mode = "rb"))
+        return sets
 
     real_lines = open(CLEAN_REAL, mode = 'r').readlines()
     real_lines = [line.strip() for line in real_lines]
-    random.shuffle(real_lines)
+    np.random.shuffle(real_lines)
     num_15 = int(len(real_lines) * .15)
     test_set = real_lines[0: num_15]
     test_label = [1] * num_15
@@ -83,7 +98,7 @@ def separate_sets(seed = 0):
 
     fake_lines = open(CLEAN_FAKE, mode = 'r').readlines()
     fake_lines = [line.strip() for line in fake_lines]
-    random.shuffle(fake_lines)
+    np.random.shuffle(fake_lines)
     num_15 = int(len(fake_lines) * .15)
     test_set += fake_lines[0: num_15]
     test_label += [0] * num_15
@@ -92,25 +107,34 @@ def separate_sets(seed = 0):
     train_set += fake_lines[2 * num_15:]
     train_label += [0] * (len(fake_lines) - 2 * num_15)
 
-    return (train_set, train_label), (val_set, val_label), (test_set, test_label)
+    sets[TRAIN_SET] = train_set
+    sets[TRAIN_LABEL] = train_label
+    sets[VAL_SET] = val_set
+    sets[VAL_LABEL] = val_label
+    sets[TEST_SET] = test_set
+    sets[TEST_LABEL] = test_label
+
+    pickle.dump(sets, open("./data/sets.p", mode = "wb"))
+
+    return sets
 
 
-def get_train_set_word_dict(train_set, train_label):
+def get_set_word_dict(data_set, label):
     """
-    Generate the word dictionary for the training set
-    :param train_set: the training set
-    :type train_set: list
-    :param train_label: the labels for training set
-    :type train_label: list
-    :return: the dictionary for the training set
+    Generate the word dictionary for the data_set
+    :param data_set: the data_set
+    :type data_set: list
+    :param label: the labels for training data_set
+    :type label: list
+    :return: the dictionary for the training data_set
     :rtype: dict
     """
     real_dict, fake_dict = {}, {}
 
-    for i in range(len(train_set)):
-        headline = train_set[i]
-        if train_label[i] == 1:
-            # use set instead of list to avoid over-count
+    for i in range(len(data_set)):
+        headline = data_set[i]
+        if label[i] == 1:
+            # use data_set instead of list to avoid over-count
             for word in set(headline.split()):
                 if word not in real_dict:
                     real_dict[word] = 1
@@ -126,90 +150,18 @@ def get_train_set_word_dict(train_set, train_label):
     return real_dict, fake_dict
 
 
-# ==================== Math ====================
-def small_product(num_arr):
-    """
-    use the fact that a1 x a2 x ... x ak = exp(log(a1) + log(a2) + ... + log(ak)) to
-    compute product of small numbers to prevent underflow
-    :param num_arr: a list of small numbers
-    :type num_arr: list
-    :return: the computed result
-    :rtype: float
-    """
-    logged_num = [math.log(n) for n in num_arr]
-    return math.exp(sum(logged_num))
-
-
-def naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat):
-    """
-    The naive bayes classifier
-    :param train_label: the training label
-    :type train_label: list
-    :param test_words: the test list that contains words
-    :type test_words: list
-    :param m: number of virtual prior
-    :type m: int
-    :param p_hat: the virtual prior
-    :type p_hat: float
-    :return: the label 1 (real) or 0 (fake)
-    :rtype: int
-    """
-    real_count = train_label.count(1)
-    fake_count = train_label.count(0)
-    total_count = len(train_label)
-
-    # Get priors
-    p_real = float(real_count) / float(total_count)
-    p_fake = float(fake_count) / float(total_count)
-
-    # Get all words probability (count) P(w | c)
-    # P(w | c) = count(word, c) / count(c)
-    real_probs, fake_probs = [], []
-    for word in test_words:
-        if word in real_dict.keys():
-            word_real_count = real_dict[word]
-        else:
-            word_real_count = 0
-        if word in fake_dict.keys():
-            word_fake_count = fake_dict[word]
-        else:
-            word_fake_count = 0
-        p_word_given_real = (float(word_real_count) + m * p_hat) / float(real_count + m)
-        p_word_given_fake = (float(word_fake_count) + m * p_hat) / float(fake_count + m)
-        real_probs.append(p_word_given_real)
-        fake_probs.append(p_word_given_fake)
-
-    # Get the likelihoods and calculate the probability of test being real and fake
-    p_real_likelihood = small_product(real_probs)
-    p_real_prob = p_real * p_real_likelihood
-
-    p_fake_likelihood = small_product(fake_probs)
-    p_fake_prob = p_fake * p_fake_likelihood
-
-    if p_real_prob >= p_fake_prob:
-        return 1
-    else:
-        return 0
-
-
 # Testing
 if __name__ == "__main__":
-    sets = separate_sets(seed = 0)
-    (train_set, train_label), (val_set, val_label), (val_set, test_label) = sets
-    real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
+    sets = separate_sets(seed = 0, overwrite = False)
+    train_set = sets[TRAIN_SET]
+    train_label = sets[TRAIN_LABEL]
+    val_set = sets[VAL_SET]
+    val_label = sets[VAL_LABEL]
+    test_set = sets[TEST_SET]
+    test_label = sets[TEST_LABEL]
 
-    m = 1
-    p_hat = 0.15
-    correct = 0
-    # for i in range(len(val_set)):
-    #     test_words = val_set[i].split()
-    #     result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)
-    #     if result == val_label[i]:
-    #         correct += 1
-    # print float(correct) / float(len(val_label))
+    print len(train_set), len(train_label)
+    print len(val_set), len(val_label)
+    print len(test_set), len(test_label)
 
-    test_words = val_set[1].split()
-    result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)
-    print "label: ", val_label[1]
-    print "result: ", result
 

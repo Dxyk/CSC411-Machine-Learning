@@ -1,7 +1,7 @@
+from util import *
+
 import operator
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-
-from util import *
 
 
 # ==================== Answers ====================
@@ -39,6 +39,7 @@ def part1(print_dict = False):
 
 
 # Part 2
+# TODO
 def part2(tune = True):
     """
     Perform naive bayes, tune the parameters m and p_hat and report the results.
@@ -48,9 +49,14 @@ def part2(tune = True):
     :rtype: None
     """
     # Generate the sets
-    sets = separate_sets(seed = 0)
-    (train_set, train_label), (val_set, val_label), (test_set, test_label) = sets
-    real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
+    sets = separate_sets(seed = 0, overwrite = False)
+    train_set = sets[TRAIN_SET]
+    train_label = sets[TRAIN_LABEL]
+    val_set = sets[VAL_SET]
+    val_label = sets[VAL_LABEL]
+    test_set = sets[TEST_SET]
+    test_label = sets[TEST_LABEL]
+    real_dict, fake_dict = get_set_word_dict(train_set, train_label)
 
     if tune:
         max_val_performance, max_correct_count = 0, 0
@@ -139,8 +145,6 @@ def part3(debug = False):
     total_count = real_count + fake_count
     # total_count = len(total_dict.keys())
     total_word_count = sum(total_dict.values())
-
-
 
     # Priors
     p_real = float(real_count) / float(total_count)
@@ -236,8 +240,61 @@ def part3(debug = False):
 
 
 # Part 4
-def part4():
-    pass
+def part4(max_iter = 10000, check_point_len = 50, tune = False):
+    """
+    :param max_iter: The maximum iterations
+    :type max_iter: int
+    :param check_point_len: the check point length
+    :type check_point_len: int
+    :param tune: the tuning flag
+    :type tune: bool
+    :return: None
+    :rtype: None
+    """
+    # Load Data
+    print "========== Loading Data =========="
+    sets = separate_sets(seed = 0, overwrite = False)
+    train_set = sets[TRAIN_SET]
+    train_label = sets[TRAIN_LABEL]
+    val_set = sets[VAL_SET]
+    val_label = sets[VAL_LABEL]
+    test_set = sets[TEST_SET]
+    test_label = sets[TEST_LABEL]
+    word_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
+    word_map = sorted(word_dict.keys())
+    # Process data to np sets
+    x_train, y_train = generate_np_data(word_map, train_set, train_label)
+    x_val, y_val = generate_np_data(word_map, val_set, val_label)
+    x_test, y_test = generate_np_data(word_map, test_set, test_label)
+
+    # Init Weight matrix
+    init_theta = np.random.normal(0, 0.05, (x_train.shape[0],))
+
+    if tune:
+        tune_lr_params(x_train, y_train, x_val, y_val, x_test, y_test, init_theta,
+                       max_iter, check_point_len)
+
+    opt_alpha, opt_reg_lambda = pickle.load(open("./data/lr_params.p", mode = "rb"))
+
+    res = grad_descent(loss_fn, dlossdw, x_train, y_train, x_val, y_val, x_test,
+                       y_test, init_theta, opt_alpha, opt_reg_lambda, max_iter,
+                       check_point_len)
+
+    theta, train_res, val_res, test_res, iters = res
+
+    pickle.dump(theta, open("data/trained_lr_weight.p", mode = "wb"))
+
+    plt.plot(iters, train_res, "b", label = "Train")
+    plt.plot(iters, val_res, "r", label = "Validation")
+    plt.plot(iters, test_res, "g", label = "Test")
+    plt.ylabel("performance")
+    plt.xlabel("iterations")
+    plt.title("Logistic Regression Learning curve")
+    plt.legend(loc = "best")
+    plt.savefig("./Report/images/4/learning_curve.png")
+    plt.show()
+
+    return
 
 
 # Part 5
@@ -261,11 +318,12 @@ def part8():
 
 
 if __name__ == "__main__":
-    # construct_word_dict(overwrite = True)
+    # construct_file_word_dict(overwrite = True)
+    # separate_sets(seed = 0, overwrite = True)
     # part1(print_dict = False)
     # part2(tune = True)
-    part3()
-    # part4()
+    # part3(debug = False)
+    part4(tune = True)
     # part5()
     # part6()
     # part7()
