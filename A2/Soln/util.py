@@ -82,17 +82,6 @@ def forward(x, W0, b0, W1, b1):
     return L0, L1, output
 
 
-def NLL(y, y_):
-    return -np.sum(y_ * np.log(y))
-
-
-def deriv_multilayer(W0, b0, W1, b1, x, L0, L1, y, y_):
-    """Incomplete function for computing the gradient of the cross-entropy
-    cost function w.r.t the parameters of a neural network"""
-    dCdL1 = y - y_
-    dCdW1 = np.dot(L0, dCdL1.T)
-
-
 def linear_forward(x, W):
     """
     Compute the given network's output.
