@@ -274,7 +274,36 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		\begin{enumerate}
+			\item 
+			The results for the top positive and negative weight words are given in the list below (a). Comparing to the top important presence and absence word list in Problem 3a, the two lists have a few common words, but Problem 3a's list contains more stop words while the list given below has less stop words.
+			
+			\item 
+			The list of words that do not include stop words are given in b.  Comparing to the top important presence and absence word list in Problem 3b, the two lists have a few common words, but they appear to be in different order. This shows that the two methods weigh the same word differently. 
+			
+			\item 
+			When using logistic regression, if the features are not normalized, some features may have way more weight than other features. If the feature is very important, the magnitude of the feature will be very large thus affect the overall performance and cost.
+			
+			For this question, using the magnitude of the logistic regression parameters to indicate importance of a feature makes sense since we are performing binary classification here. The magnitude of the feature only decides whether the news is real or not. If there are more than two classes, using the magnitude of the parameters to indicate importance would be a mistake.
+			
+		\end{enumerate}
 		
+		\begin{lstlisting}[caption = Top positive and negative words]
+	a:
+	Positive:
+	['trumps', 'australia', 'us', 'turnbull', 'tax', 'korea', 'ban', 
+	'donald', 'debate', 'administration']
+	Negative:
+	['hillary', 'victory', 'breaking', 'just', 'watch', 'information', 
+	'u', 'are', 'd', 'soros']
+	b:
+	Positive:
+	['trumps', 'australia', 'turnbull', 'tax', 'korea', 'ban', 'donald', 
+	'debate', 'administration', 'says']
+	Negative:
+	['hillary', 'victory', 'breaking', 'just', 'watch', 'information', 'u', 
+	'd', 'soros', 'won']
+		\end{lstlisting}
 		
 	\end{homeworkProblem}
 	\clearpage

@@ -307,6 +307,34 @@ def part6():
     theta = pickle.load(open("./data/trained_lr_weight.p", mode = "rb"))
     word_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
     word_map = sorted(word_dict.keys())
+    theta = theta[:-1]
+    word_weights = {}
+    for idx, word in enumerate(word_map):
+        word_weights[word] = theta[idx]
+    sorted_word_weights = sorted(word_weights.items(), key = operator.itemgetter(1),
+                                 reverse = True)
+
+    top_pos = sorted_word_weights[:10]
+    top_neg = sorted_word_weights[-1:-11:-1]
+    print "a:"
+    print "Positive:"
+    print [i[0] for i in top_pos]
+    print "Negative:"
+    print [i[0] for i in top_neg]
+
+    # b
+    sorted_word_weights = [word_weight for word_weight in sorted_word_weights if word_weight[0] not in ENGLISH_STOP_WORDS]
+
+    top_pos = sorted_word_weights[:10]
+    top_neg = sorted_word_weights[-1:-11:-1]
+    print "b:"
+    print "Positive:"
+    print [i[0] for i in top_pos]
+    print "Negative:"
+    print [i[0] for i in top_neg]
+
+    return
+
 
 
 
@@ -327,8 +355,8 @@ if __name__ == "__main__":
     # part1(print_dict = False)
     # part2(tune = True)
     # part3(debug = False)
-    part4(tune = False)
+    # part4(tune = False)
     # part5()
-    # part6()
+    part6()
     # part7()
     # part8()
