@@ -315,6 +315,45 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		\begin{enumerate}
+			\item 
+			The relationship between the maximum depth of the decision tree and its performance is shown in Fig\ref{fig:7.1}. To generate the graph, the depth was chosen to be from range(1, 300, 30). As we can see, the graph looks similar to the learning rate graph in gradient descent. 
+			
+			The best performing depth was chosen to be {} because it has the highest validation performance.
+			
+			Except for the max\_depth, the criterion parameter was chosen to be 'entropy' while constructing the tree. This is to relate to the following questions.
+			
+			\item 
+			The visualization of the best decision tree above is given in Fig\ref{fig:7.2}.
+			
+			We can see that all the words in the first two layer of the decision tree are in the list of important words in part 3.
+			
+			\item 
+			Performance of Naive Bayes: {}
+			
+			Performance of Logistic Regression: {}
+			
+			Performance of Decision Tree: {}
+			
+		\end{enumerate}
+		
+		\begin{figure*}[!ht]
+		
+			\begin{subfigure}{.45\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/dt_performance.png}
+				\caption{caption}
+				\label{fig:7.1}
+			\end{subfigure}
+			\begin{subfigure}{.45\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/tree.png}
+				\caption{caption}
+				\label{fig:7.2}
+			\end{subfigure}
+
+		\end{figure*}
+		
 		
 		
 	\end{homeworkProblem}
@@ -326,9 +365,23 @@
 	%	PROBLEM 8
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
-		
-		
+	
+		\begin{enumerate}
+			\item 
+			The first split of the tree is on the word $w$: ``the". Through the following calculations, we get that:
+			
+			\begin{align*}
+			H(w | Y = real) &= -P(w) \log(P(word | Y = real)) + -P(not\ word) \log(P(not\ word | Y = real))\\
+			H(w | Y = fake) &= -P(w) \log(P(word | Y = fake)) + -P(not\ word) \log(P(not\ word | Y = fake))\\
+			H(w | Y) &= P(Y = real) H(w | Y = real) + P(Y = fake) H(w | Y = fake)\\
+			H(Y) &= -P(Y = real) \log (P(Y = real)) + -P(Y = fake) \log (P(Y = fake))\\
+			I(Y; w) &= H(Y) - H(w | Y)\\
+			\end{align*}
+			
+			
+			\item 
+		\end{enumerate}
+	
 	\end{homeworkProblem}
 	\clearpage
 	

@@ -1,5 +1,6 @@
 from naive_bayes import *
 from logistic_regression import *
+from decision_tree import *
 
 import numpy as np
 import os

@@ -2,6 +2,9 @@ from util import *
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import operator
 import matplotlib.pyplot as plt
+import pydot
+import subprocess
+
 
 
 # ==================== Answers ====================
@@ -336,17 +339,107 @@ def part6():
     return
 
 
-
-
-
 # Part 7
 def part7():
-    pass
+    print "========== Loading Data =========="
+    sets = separate_sets(seed = 0, overwrite = False)
+    train_set = sets[TRAIN_SET]
+    train_label = sets[TRAIN_LABEL]
+    val_set = sets[VAL_SET]
+    val_label = sets[VAL_LABEL]
+    test_set = sets[TEST_SET]
+    test_label = sets[TEST_LABEL]
+    word_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
+    word_map = sorted(word_dict.keys())
+
+    print "========== Generating Data =========="
+    dt_train_set, dt_train_label = generate_dt_data(word_map, train_set, train_label)
+    dt_val_set, dt_val_label = generate_dt_data(word_map, val_set, val_label)
+    dt_test_set, dt_test_label = generate_dt_data(word_map, test_set, test_label)
+
+    max_depths = range(1, 300, 30)
+
+    train_res = []
+    val_res = []
+    test_res = []
+    opt_performance = 0
+    opt_depth = 0
+
+    for depth in max_depths:
+        print "Training on max depth = {}".format(depth)
+        clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = depth)
+        clf = clf.fit(dt_train_set, dt_train_label)
+
+        prediction = clf.predict(dt_train_set)
+        train_performance = get_dt_performance(prediction, dt_train_label)
+        print "Training: {:.2%}".format(train_performance)
+        train_res.append(train_performance)
+
+        prediction = clf.predict(dt_val_set)
+        val_performance = get_dt_performance(prediction, dt_val_label)
+        print "Validation: {:.2%}".format(val_performance)
+        val_res.append(val_performance)
+
+        prediction = clf.predict(dt_test_set)
+        test_performance = get_dt_performance(prediction, dt_test_label)
+        print "Test: {:.2%}".format(test_performance)
+        test_res.append(test_performance)
+
+        if val_performance > opt_performance:
+            opt_performance = val_performance
+            opt_depth = depth
+
+    print "========== Done Tuning =========="
+    print "Optimum depth: {}".format(opt_depth)
+    print "Optimum validation performance: {}".format(opt_performance)
+
+    clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = opt_depth)
+    clf = clf.fit(dt_train_set, dt_train_label)
+
+    dot_path = "./Report/images/7/tree.dot"
+    png_path = "./Report/images/7/tree.png"
+
+    dot_data = tree.export_graphviz(clf, out_file=open(dot_path, mode = "wb"),
+                                    max_depth = 2,
+                                    feature_names = word_map,
+                                    filled=True, rounded=True,
+                                    special_characters=True)
+    graph = graphviz.Source(dot_data)
+
+    # TODO: not working: generate manually by typing the following command in shell
+    subprocess.check_call("dot -Tpng {} -o {}".format(dot_path, png_path).split())
+    print "please run:\n\tdot -Tpng {} -o {}".format(dot_path, png_path)
+
+    plt.plot(max_depths, train_res, "b", label = "Train")
+    plt.plot(max_depths, val_res, "r", label = "Validation")
+    plt.plot(max_depths, test_res, "g", label = "Test")
+    plt.ylabel("performance")
+    plt.xlabel("max depth")
+    plt.title("Decision tree performance with different max depths")
+    plt.legend(loc = "best")
+    plt.savefig("./Report/images/7/dt_performance.png")
+    plt.show()
 
 
 # Part 8
-def part8():
-    pass
+def part8(word):
+    sets = separate_sets(seed = 0, overwrite = False)
+    train_set = sets[TRAIN_SET]
+    train_label = sets[TRAIN_LABEL]
+    val_set = sets[VAL_SET]
+    val_label = sets[VAL_LABEL]
+    test_set = sets[TEST_SET]
+    test_label = sets[TEST_LABEL]
+
+    total_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
+    pickle.dump(real_dict, open("./data/real_dict.p", "wb"))
+    pickle.dump(fake_dict, open("./data/fake_dict.p", "wb"))
+    word_map = sorted(total_dict.keys())
+
+    # entropy H(v) = sum(-p_v * log(p_v))
+    # Conditional_entropy = H(B | A) = sum_a(P(A = a) H(B | A = a)) =  sum_a(P(A = a) * -sum(P(B = b) log(P(B = b | A = a)) )
+    # Mutual Information = I(a; b) = H(B) - H(B | A) = H(A) - H(A | B)
+
 
 
 if __name__ == "__main__":
@@ -357,6 +450,6 @@ if __name__ == "__main__":
     # part3(debug = False)
     # part4(tune = False)
     # part5()
-    part6()
-    # part7()
+    # part6()
+    part7()
     # part8()

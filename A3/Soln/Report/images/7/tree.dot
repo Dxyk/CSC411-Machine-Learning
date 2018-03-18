@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label=<donald &le; 0.5<br/>entropy = 0.97<br/>samples = 2288<br/>value = [910, 1378]>, fillcolor="#399de557"] ;
+1 [label=<the &le; 0.5<br/>entropy = 1.0<br/>samples = 1544<br/>value = [758, 786]>, fillcolor="#399de509"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<hillary &le; 0.5<br/>entropy = 0.985<br/>samples = 1260<br/>value = [538, 722]>, fillcolor="#399de541"] ;
+1 -> 2 ;
+3 [label="(...)", fillcolor="#C0C0C0"] ;
+2 -> 3 ;
+464 [label="(...)", fillcolor="#C0C0C0"] ;
+2 -> 464 ;
+471 [label=<are &le; 0.5<br/>entropy = 0.77<br/>samples = 284<br/>value = [220, 64]>, fillcolor="#e58139b5"] ;
+1 -> 471 ;
+472 [label="(...)", fillcolor="#C0C0C0"] ;
+471 -> 472 ;
+587 [label="(...)", fillcolor="#C0C0C0"] ;
+471 -> 587 ;
+588 [label=<the &le; 0.5<br/>entropy = 0.73<br/>samples = 744<br/>value = [152, 592]>, fillcolor="#399de5be"] ;
+0 -> 588 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+589 [label=<hillary &le; 0.5<br/>entropy = 0.64<br/>samples = 652<br/>value = [106, 546]>, fillcolor="#399de5cd"] ;
+588 -> 589 ;
+590 [label="(...)", fillcolor="#C0C0C0"] ;
+589 -> 590 ;
+715 [label="(...)", fillcolor="#C0C0C0"] ;
+589 -> 715 ;
+734 [label=<trump &le; 0.5<br/>entropy = 1.0<br/>samples = 92<br/>value = [46, 46]>, fillcolor="#e5813900"] ;
+588 -> 734 ;
+735 [label="(...)", fillcolor="#C0C0C0"] ;
+734 -> 735 ;
+736 [label="(...)", fillcolor="#C0C0C0"] ;
+734 -> 736 ;
+}
