@@ -162,16 +162,16 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		The Naive Bayes algorithm is implemented in naive\_bayes in util.py. To tune the parameters $m$ and $\hat{p}$, we try using naive bayes on different value of $m$ and $\hat{p}$ and pick one that has the best performance on the validation set. The range of test values for $m$ was from 1 to 10, and for $\hat{p}$ was from 0.05 to 0.95. The returned optimum values were $m = 1$ and $\hat{p} = 0.05$.\\
+		The Naive Bayes algorithm is implemented in naive\_bayes in util.py. To tune the parameters $m$ and $\hat{p}$, we try using naive bayes on different value of $m$ and $\hat{p}$ and pick one that has the best performance on the validation set. The range of test values for $m$ was from 1 to 10, and for $\hat{p}$ was from 0.05 to 0.95. The returned optimum values were $m = 1$ and $\hat{p} = 0.25$.\\
 		
 		To deal with small multiplication, a small\_product function was implemented in util.py. It takes in a list of small values and uses the fact that $\prod \limits_{i = 1}^{N} a_i = \exp (\sum \limits_{i = 1}^{N} \log(a_i))$ to compute the value of $p(a_1, a_2, \dots, a_n) = p(a_1) p(a_2) \dots p(a_1)$\\
 		
 		The performance on training set, validation set and test set is given below:
 		
 		\begin{lstlisting}[caption = Performance]
-	train performance = 0.954108391608
-	validation performance = 0.78936605317
-	test performance = 0.775051124744
+	train performance = 0.964597902098
+	validation performance = 0.842535787321
+	test performance = 0.881390593047
 		\end{lstlisting}
 		
 	\end{homeworkProblem}
@@ -319,7 +319,7 @@
 			\item 
 			The relationship between the maximum depth of the decision tree and its performance is shown in Fig\ref{fig:7.1}. To generate the graph, the depth was chosen to be from range(1, 300, 30). As we can see, the graph looks similar to the learning rate graph in gradient descent. 
 			
-			The best performing depth was chosen to be {} because it has the highest validation performance.
+			The best performing depth was chosen to be {151} because it has the highest validation performance.
 			
 			Except for the max\_depth, the criterion parameter was chosen to be 'entropy' while constructing the tree. This is to relate to the following questions.
 			
@@ -329,11 +329,22 @@
 			We can see that all the words in the first two layer of the decision tree are in the list of important words in part 3.
 			
 			\item 
-			Performance of Naive Bayes: {}
+			The performance of three methods are given in the table below. We can see that Naive Bayes has the highest validation and test result. Decision Tree has the best training result (100\%), but the lowest validation and test result. This is because it over-fits the data too much. 
 			
-			Performance of Logistic Regression: {}
-			
-			Performance of Decision Tree: {}
+			\begin{table}[h!]
+				\centering
+				\begin{tabular}{||c || c | c | c||} 
+					\hline
+					Method & Train & Validation & Test \\ [0.5ex] 
+					\hline\hline
+					Naive Bayes & 96.46 & 84.25 & 88.14 \\ 
+					\hline
+					Logistic Regression & 97.90 & 84.05 & 84.66 \\
+					\hline
+					Decision Tree & 100 & 76.07 & 78.32 \\
+					\hline
+				\end{tabular}
+			\end{table}
 			
 		\end{enumerate}
 		
@@ -342,13 +353,13 @@
 			\begin{subfigure}{.45\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{images/7/dt_performance.png}
-				\caption{caption}
+				\caption{Learning Curve}
 				\label{fig:7.1}
 			\end{subfigure}
 			\begin{subfigure}{.45\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{images/7/tree.png}
-				\caption{caption}
+				\caption{Decision Tree}
 				\label{fig:7.2}
 			\end{subfigure}
 
@@ -368,18 +379,35 @@
 	
 		\begin{enumerate}
 			\item 
-			The first split of the tree is on the word $w$: ``the". Through the following calculations, we get that:
+			The first split of the tree is on the word $x_i$: ``donald". Through the following calculations, we get that:
 			
 			\begin{align*}
-			H(w | Y = real) &= -P(w) \log(P(word | Y = real)) + -P(not\ word) \log(P(not\ word | Y = real))\\
-			H(w | Y = fake) &= -P(w) \log(P(word | Y = fake)) + -P(not\ word) \log(P(not\ word | Y = fake))\\
-			H(w | Y) &= P(Y = real) H(w | Y = real) + P(Y = fake) H(w | Y = fake)\\
-			H(Y) &= -P(Y = real) \log (P(Y = real)) + -P(Y = fake) \log (P(Y = fake))\\
-			I(Y; w) &= H(Y) - H(w | Y)\\
+			H(Y) &= -P(Y = real) \log (P(Y = real)) + -P(Y = fake) \log (P(Y = fake)) = 0.967\\
+				&= -\dfrac{910}{2288} \times \log(\dfrac{910}{2288}) - \dfrac{1378}{2288} \times \log( \dfrac{1378}{2288})\\
+				&= 0.967\\
+			H(Y | x_i) &= P(x_i = 0) H(Y | x_i = 0) + P(x_i = 1) H(Y | x_i = 1)\\
+				&= \dfrac{1544}{2288} \times 1 + \dfrac{744}{2288} \times 0.73\\
+				&= 0.911\\
+			I(Y; x_i) &= H(Y) - H(Y | x_i) = 0.056\\
 			\end{align*}
 			
-			
 			\item 
+			The second split word $x_j$ is chosen to ``the". Through the following calculations, we get that:
+			\begin{align*}
+			H(Y | x_j = 1) &= - (\dfrac{644}{1912} \times \log(\dfrac{644}{1912})) - (\dfrac{1268}{1912} \times \log(\dfrac{1268}{1912}))\\
+				&= 0.921\\
+			H(Y | x_j = 0) &= - (\dfrac{266}{376} \times \log(\dfrac{266}{376})) - (\dfrac{110}{376} \times \log(\dfrac{110}{376}))\\
+				&= 0.871\\
+			H(Y | x_j) &= \dfrac{1912}{2288} \times 0.921 + \dfrac{376}{2288} \times 0.871\\
+				&= 0.913
+			\end{align*}
+			
+			Then 
+			\begin{align*}
+				I(Y, x_j) = 0.967 - 0.913 = 0.054
+			\end{align*}
+			
+			This value is very close to the value we computed in 8(a), but it is still smaller. This is because these two words are very close and if this word has a larger information gain than x\_i, this word should be the first word to split the tree.
 		\end{enumerate}
 	
 	\end{homeworkProblem}

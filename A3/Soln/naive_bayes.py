@@ -17,8 +17,7 @@ def small_product(num_arr):
     return math.exp(sum(logged_num))
 
 
-# ========== Naive Bayes ==========
-def naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat):
+def naive_bayes(train_label, train_word_dict, test_words, m, p_hat):
     """
     The naive bayes classifier
     :param train_label: the training label
@@ -39,31 +38,26 @@ def naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat):
     # Get priors
     p_real = float(real_count) / float(total_count)
     p_fake = float(fake_count) / float(total_count)
-
-    # Get all words probability (count) P(w | c)
-    # P(w | c) = count(word, c) / count(c)
     real_probs, fake_probs = [], []
-    for word in test_words:
-        if word in real_dict.keys():
-            word_real_count = real_dict[word]
+
+    for word, word_count in train_word_dict.iteritems():
+        if word in test_words:
+            real_probs.append((float(word_count[0]) + m * p_hat) / float(real_count + m))
+            fake_probs.append((float(word_count[1]) + m * p_hat) / float(fake_count + m))
         else:
-            word_real_count = 0
-        if word in fake_dict.keys():
-            word_fake_count = fake_dict[word]
-        else:
-            word_fake_count = 0
-        p_word_given_real = (float(word_real_count) + m * p_hat) / float(real_count + m)
-        p_word_given_fake = (float(word_fake_count) + m * p_hat) / float(fake_count + m)
-        real_probs.append(p_word_given_real)
-        fake_probs.append(p_word_given_fake)
+            real_probs.append(1. - (float(word_count[0]) + m * p_hat) / float(real_count + m))
+            fake_probs.append(1. - (float(word_count[1]) + m * p_hat) / float(fake_count + m))
 
     # Get the likelihoods and calculate the probability of test being real and fake
     p_real_likelihood = small_product(real_probs)
-    p_real_prob = p_real * p_real_likelihood
+    p_real_prob = p_real_likelihood * p_real
 
     p_fake_likelihood = small_product(fake_probs)
-    p_fake_prob = p_fake * p_fake_likelihood
+    p_fake_prob = p_fake_likelihood * p_fake
 
+
+    # prediction = np.argmax([p_real_prob, p_fake_prob])
+    # print "prediction:", prediction
     if p_real_prob >= p_fake_prob:
         return 1
     else:
@@ -79,17 +73,11 @@ if __name__ == "__main__":
     test_set = sets[TEST_SET]
     test_label = sets[TEST_LABEL]
 
-    real_dict, fake_dict = get_set_word_dict(train_set, train_label)
+    real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
 
     m = 1
     p_hat = 0.15
     correct = 0
-    # for i in range(len(val_set)):
-    #     test_words = val_set[i].split()
-    #     result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)
-    #     if result == val_label[i]:
-    #         correct += 1
-    # print float(correct) / float(len(val_label))
 
     test_words = val_set[1].split()
     result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)

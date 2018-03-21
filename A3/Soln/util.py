@@ -120,7 +120,7 @@ def separate_sets(seed = 0, overwrite = False):
     return sets
 
 
-def get_set_word_dict(data_set, label):
+def get_train_set_word_dict(data_set, label):
     """
     Generate the word dictionary for the data_set
     :param data_set: the data_set
@@ -130,25 +130,25 @@ def get_set_word_dict(data_set, label):
     :return: the dictionary for the training data_set
     :rtype: dict
     """
-    real_dict, fake_dict = {}, {}
+    total_dict = {}
 
     for i in range(len(data_set)):
         headline = data_set[i]
         if label[i] == 1:
-            # use data_set instead of list to avoid over-count
+            # use set instead of list to avoid over-count
             for word in set(headline.split()):
-                if word not in real_dict:
-                    real_dict[word] = 1
+                if word not in total_dict:
+                    total_dict[word] = [1, 0]
                 else:
-                    real_dict[word] += 1
+                    total_dict[word][0] += 1
         else:
             for word in set(headline.split()):
-                if word not in fake_dict:
-                    fake_dict[word] = 1
+                if word not in total_dict:
+                    total_dict[word] = [0, 1]
                 else:
-                    fake_dict[word] += 1
+                    total_dict[word][1] += 1
 
-    return real_dict, fake_dict
+    return total_dict
 
 
 # Testing

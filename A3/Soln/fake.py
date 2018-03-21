@@ -1,10 +1,11 @@
+from sklearn.tree import DecisionTreeClassifier
+
 from util import *
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import operator
 import matplotlib.pyplot as plt
 import pydot
 import subprocess
-
 
 
 # ==================== Answers ====================
@@ -42,7 +43,6 @@ def part1(print_dict = False):
 
 
 # Part 2
-# TODO
 def part2(tune = True):
     """
     Perform naive bayes, tune the parameters m and p_hat and report the results.
@@ -59,7 +59,8 @@ def part2(tune = True):
     val_label = sets[VAL_LABEL]
     test_set = sets[TEST_SET]
     test_label = sets[TEST_LABEL]
-    real_dict, fake_dict = get_set_word_dict(train_set, train_label)
+    # real_dict, fake_dict = get_train_set_word_dict(train_set, train_label)
+    total_dict = get_train_set_word_dict(train_set, train_label)
 
     if tune:
         max_val_performance, max_correct_count = 0, 0
@@ -72,7 +73,7 @@ def part2(tune = True):
                 correct_count = 0
                 for i in range(len(val_set)):
                     val_words = val_set[i].split()
-                    result = naive_bayes(train_label, real_dict, fake_dict, val_words, m, p_hat)
+                    result = naive_bayes(train_label, total_dict, val_words, m, p_hat)
                     if result == val_label[i]:
                         correct_count += 1
                 performance = float(correct_count) / float(len(val_set))
@@ -96,7 +97,7 @@ def part2(tune = True):
     correct_count = 0
     for i in range(len(train_set)):
         train_words = train_set[i].split()
-        result = naive_bayes(train_label, real_dict, fake_dict, train_words, m, p_hat)
+        result = naive_bayes(train_label, total_dict, train_words, m, p_hat)
         if result == train_label[i]:
             correct_count += 1
         train_performance = float(correct_count) / float(len(train_label))
@@ -104,7 +105,7 @@ def part2(tune = True):
     correct_count = 0
     for i in range(len(val_set)):
         val_words = val_set[i].split()
-        result = naive_bayes(train_label, real_dict, fake_dict, val_words, m, p_hat)
+        result = naive_bayes(train_label, total_dict, val_words, m, p_hat)
         if result == val_label[i]:
             correct_count += 1
         val_performance = float(correct_count) / float(len(val_label))
@@ -112,7 +113,7 @@ def part2(tune = True):
     correct_count = 0
     for i in range(len(test_set)):
         test_words = test_set[i].split()
-        result = naive_bayes(train_label, real_dict, fake_dict, test_words, m, p_hat)
+        result = naive_bayes(train_label, total_dict, test_words, m, p_hat)
         if result == test_label[i]:
             correct_count += 1
         test_performance = float(correct_count) / float(len(test_label))
@@ -175,7 +176,6 @@ def part3(debug = False):
         else:
             word_fake_count = 0
         # p_word = float(total_dict[word]) / float(total_word_count)
-        # TODO: results are not right when we add p(word) to the calculations, why?
         p_word = 1
         # P(real | word) = P(word | real) P(real) / P(word)
         p_word_given_real = float(word_real_count + m * p_hat) / float(real_count + m)
@@ -287,6 +287,10 @@ def part4(max_iter = 10000, check_point_len = 50, tune = False):
 
     pickle.dump(theta, open("data/trained_lr_weight.p", mode = "wb"))
 
+    print "train performance = {}".format(train_res[-1])
+    print "validation performance = {}".format(val_res[-1])
+    print "test performance = {}".format(test_res[-1])
+
     plt.plot(iters, train_res, "b", label = "Train")
     plt.plot(iters, val_res, "r", label = "Validation")
     plt.plot(iters, test_res, "g", label = "Test")
@@ -340,7 +344,7 @@ def part6():
 
 
 # Part 7
-def part7():
+def part7(opt_depth = 0):
     print "========== Loading Data =========="
     sets = separate_sets(seed = 0, overwrite = False)
     train_set = sets[TRAIN_SET]
@@ -357,99 +361,94 @@ def part7():
     dt_val_set, dt_val_label = generate_dt_data(word_map, val_set, val_label)
     dt_test_set, dt_test_label = generate_dt_data(word_map, test_set, test_label)
 
-    max_depths = range(1, 300, 30)
+    if opt_depth == 0:
+        max_depths = range(1, 300, 30)
 
-    train_res = []
-    val_res = []
-    test_res = []
-    opt_performance = 0
-    opt_depth = 0
+        train_res = []
+        val_res = []
+        test_res = []
+        opt_performance = 0
+        opt_depth = 0
 
-    for depth in max_depths:
-        print "Training on max depth = {}".format(depth)
-        clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = depth)
-        clf = clf.fit(dt_train_set, dt_train_label)
+        for depth in max_depths:
+            print "Training on max depth = {}".format(depth)
+            clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = depth)
+            clf = clf.fit(dt_train_set, dt_train_label)
 
-        prediction = clf.predict(dt_train_set)
-        train_performance = get_dt_performance(prediction, dt_train_label)
-        print "Training: {:.2%}".format(train_performance)
-        train_res.append(train_performance)
+            prediction = clf.predict(dt_train_set)
+            train_performance = get_dt_performance(prediction, dt_train_label)
+            print "Training: {:.2%}".format(train_performance)
+            train_res.append(train_performance)
 
-        prediction = clf.predict(dt_val_set)
-        val_performance = get_dt_performance(prediction, dt_val_label)
-        print "Validation: {:.2%}".format(val_performance)
-        val_res.append(val_performance)
+            prediction = clf.predict(dt_val_set)
+            val_performance = get_dt_performance(prediction, dt_val_label)
+            print "Validation: {:.2%}".format(val_performance)
+            val_res.append(val_performance)
 
-        prediction = clf.predict(dt_test_set)
-        test_performance = get_dt_performance(prediction, dt_test_label)
-        print "Test: {:.2%}".format(test_performance)
-        test_res.append(test_performance)
+            prediction = clf.predict(dt_test_set)
+            test_performance = get_dt_performance(prediction, dt_test_label)
+            print "Test: {:.2%}".format(test_performance)
+            test_res.append(test_performance)
 
-        if val_performance > opt_performance:
-            opt_performance = val_performance
-            opt_depth = depth
+            if val_performance > opt_performance:
+                opt_performance = val_performance
+                opt_depth = depth
 
-    print "========== Done Tuning =========="
-    print "Optimum depth: {}".format(opt_depth)
-    print "Optimum validation performance: {}".format(opt_performance)
+        print "========== Done Tuning =========="
+        print "Optimum depth: {}".format(opt_depth)
+        print "Optimum validation performance: {}".format(opt_performance)
+
+        dot_path = "./Report/images/7/tree.dot"
+        png_path = "./Report/images/7/tree.png"
+
+        dot_data = tree.export_graphviz(clf, out_file=open(dot_path, mode = "wb"),
+                                        max_depth = 2,
+                                        feature_names = word_map,
+                                        filled=True, rounded=True,
+                                        special_characters=True)
+        graph = graphviz.Source(dot_data)
+
+        subprocess.check_call("dot -Tpng {} -o {}".format(dot_path, png_path).split())
+        print "please run:\n\tdot -Tpng {} -o {}".format(dot_path, png_path)
+
+        plt.plot(max_depths, train_res, "b", label = "Train")
+        plt.plot(max_depths, val_res, "r", label = "Validation")
+        plt.plot(max_depths, test_res, "g", label = "Test")
+        plt.ylabel("performance")
+        plt.xlabel("max depth")
+        plt.title("Decision tree performance with different max depths")
+        plt.legend(loc = "best")
+        plt.savefig("./Report/images/7/dt_performance.png")
+        plt.show()
 
     clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = opt_depth)
     clf = clf.fit(dt_train_set, dt_train_label)
 
-    dot_path = "./Report/images/7/tree.dot"
-    png_path = "./Report/images/7/tree.png"
+    prediction = clf.predict(dt_train_set)
+    train_performance = get_dt_performance(prediction, dt_train_label)
+    print "Training: {:.2%}".format(train_performance)
 
-    dot_data = tree.export_graphviz(clf, out_file=open(dot_path, mode = "wb"),
-                                    max_depth = 2,
-                                    feature_names = word_map,
-                                    filled=True, rounded=True,
-                                    special_characters=True)
-    graph = graphviz.Source(dot_data)
+    prediction = clf.predict(dt_val_set)
+    val_performance = get_dt_performance(prediction, dt_val_label)
+    print "Validation: {:.2%}".format(val_performance)
 
-    # TODO: not working: generate manually by typing the following command in shell
-    subprocess.check_call("dot -Tpng {} -o {}".format(dot_path, png_path).split())
-    print "please run:\n\tdot -Tpng {} -o {}".format(dot_path, png_path)
-
-    plt.plot(max_depths, train_res, "b", label = "Train")
-    plt.plot(max_depths, val_res, "r", label = "Validation")
-    plt.plot(max_depths, test_res, "g", label = "Test")
-    plt.ylabel("performance")
-    plt.xlabel("max depth")
-    plt.title("Decision tree performance with different max depths")
-    plt.legend(loc = "best")
-    plt.savefig("./Report/images/7/dt_performance.png")
-    plt.show()
+    prediction = clf.predict(dt_test_set)
+    test_performance = get_dt_performance(prediction, dt_test_label)
+    print "Test: {:.2%}".format(test_performance)
 
 
 # Part 8
-def part8(word):
-    sets = separate_sets(seed = 0, overwrite = False)
-    train_set = sets[TRAIN_SET]
-    train_label = sets[TRAIN_LABEL]
-    val_set = sets[VAL_SET]
-    val_label = sets[VAL_LABEL]
-    test_set = sets[TEST_SET]
-    test_label = sets[TEST_LABEL]
-
-    total_dict = pickle.load(open("./data/total_dict.p", mode = "rb"))
-    pickle.dump(real_dict, open("./data/real_dict.p", "wb"))
-    pickle.dump(fake_dict, open("./data/fake_dict.p", "wb"))
-    word_map = sorted(total_dict.keys())
-
-    # entropy H(v) = sum(-p_v * log(p_v))
-    # Conditional_entropy = H(B | A) = sum_a(P(A = a) H(B | A = a)) =  sum_a(P(A = a) * -sum(P(B = b) log(P(B = b | A = a)) )
-    # Mutual Information = I(a; b) = H(B) - H(B | A) = H(A) - H(A | B)
-
-
+def part8():
+    pass
 
 if __name__ == "__main__":
     # construct_file_word_dict(overwrite = True)
     # separate_sets(seed = 0, overwrite = True)
-    # part1(print_dict = False)
+    # part1(print_dict = True)
     # part2(tune = True)
-    # part3(debug = False)
-    # part4(tune = False)
-    # part5()
-    # part6()
-    part7()
-    # part8()
+    # part3(debug = True)
+    # part4(tune = True)
+    part5()
+    part6()
+    part7(151)
+    part8()
