@@ -16,7 +16,17 @@ class Environment(object):
     """
     The Tic-Tac-Toe Environment
     """
-    a
+    # possible ways to win
+    win_set = frozenset([(0, 1, 2), (3, 4, 5), (6, 7, 8),  # horizontal
+                         (0, 3, 6), (1, 4, 7), (2, 5, 8),  # vertical
+                         (0, 4, 8), (2, 4, 6)])  # diagonal
+    # statuses
+    STATUS_VALID_MOVE = 'valid'
+    STATUS_INVALID_MOVE = 'inv'
+    STATUS_WIN = 'win'
+    STATUS_TIE = 'tie'
+    STATUS_LOSE = 'lose'
+    STATUS_DONE = 'done'
 
     def __init__(self):
         self.reset()
