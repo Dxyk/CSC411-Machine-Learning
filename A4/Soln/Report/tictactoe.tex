@@ -196,10 +196,21 @@ class Policy(nn.Module):
 		%		\noindent \textit{Question}
 		\begin{enumerate}
 			\item 
-			
+			the implementation for compute\_returns is shown in the listing below.
+			\begin{lstlisting}[language = python, caption = compute return]
+def compute_returns(rewards, gamma = 1.0):
+	res = []
+	for i in range(len(rewards)):
+		curr_return = 0
+		cur_rewards = rewards[i:]
+		for j in range(len(cur_rewards)):
+			curr_return += cur_rewards[j] * (gamma ** j)
+		res.append(curr_return)
+	return res
+			\end{lstlisting}
 			
 			\item 
-			
+			The backward pass cannot be computed during the episode because the reward is not fully recorded and thus computing the gradient may produce a biased return.
 			
 		\end{enumerate}
 		

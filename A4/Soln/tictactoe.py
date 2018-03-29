@@ -161,6 +161,14 @@ def compute_returns(rewards, gamma = 1.0):
     [-2.5965000000000003, -2.8850000000000002, -2.6500000000000004, -8.5, -10.0]
     """
     # TODO
+    res = []
+    for i in range(len(rewards)):
+        curr_return = 0
+        cur_rewards = rewards[i:]
+        for j in range(len(cur_rewards)):
+            curr_return += cur_rewards[j] * (gamma ** j)
+        res.append(curr_return)
+    return res
 
 
 def finish_episode(saved_rewards, saved_logprobs, gamma = 1.0):
