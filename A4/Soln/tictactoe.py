@@ -11,35 +11,26 @@ import torch.optim as optim
 import torch.distributions
 from torch.autograd import Variable
 
+
 class Environment(object):
     """
     The Tic-Tac-Toe Environment
     """
-    # possible ways to win
-    win_set = frozenset([(0,1,2), (3,4,5), (6,7,8), # horizontal
-                         (0,3,6), (1,4,7), (2,5,8), # vertical
-                         (0,4,8), (2,4,6)])         # diagonal
-    # statuses
-    STATUS_VALID_MOVE = 'valid'
-    STATUS_INVALID_MOVE = 'inv'
-    STATUS_WIN = 'win'
-    STATUS_TIE = 'tie'
-    STATUS_LOSE = 'lose'
-    STATUS_DONE = 'done'
+    a
 
     def __init__(self):
         self.reset()
 
     def reset(self):
         """Reset the game to an empty board."""
-        self.grid = np.array([0] * 9) # grid
-        self.turn = 1                 # whose turn it is
-        self.done = False             # whether game is done
+        self.grid = np.array([0] * 9)  # grid: 1-D array of 9 elements
+        self.turn = 1  # whose turn it is: 1:x; 2:o
+        self.done = False  # whether game is done
         return self.grid
 
     def render(self):
         """Print what is on the board."""
-        map = {0:'.', 1:'x', 2:'o'} # grid label vs how to plot
+        map = {0: '.', 1: 'x', 2: 'o'}  # grid label vs how to plot
         print(''.join(map[i] for i in self.grid[0:3]))
         print(''.join(map[i] for i in self.grid[3:6]))
         print(''.join(map[i] for i in self.grid[6:9]))
@@ -54,8 +45,14 @@ class Environment(object):
         return False
 
     def step(self, action):
-        """Mark a point on position action."""
-        assert type(action) == int and action >= 0 and action < 9
+        """
+        Mark a point on position action.
+        :param action: the action to take (0 - 8)
+        :type action: int
+        :return (grid, status, done?)
+        :rtype tuple
+        """
+        assert type(action) == int and 0 <= action < 9
         # done = already finished the game
         if self.done:
             return self.grid, self.STATUS_DONE, self.done
@@ -98,35 +95,53 @@ class Environment(object):
                     raise ValueError("???")
         return state, status, done
 
+
 class Policy(nn.Module):
     """
     The Tic-Tac-Toe Policy
     """
-    def __init__(self, input_size=27, hidden_size=64, output_size=9):
+
+    def __init__(self, input_size = 27, hidden_size = 64, output_size = 9):
         super(Policy, self).__init__()
         # TODO
+        self.network = nn.Sequential(
+            nn.Linear(input_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, output_size),
+            nn.ReLU()
+        )
 
     def forward(self, x):
         # TODO
+        return self.network(x)
+
 
 def select_action(policy, state):
-    """Samples an action from the policy at the state."""
+    """Samples an action from the policy at the state.
+    :param policy: policy
+    :type policy: Policy
+    :param state: the states (Environment.grid)
+    :type state: ndarray
+    :return (action (int), log_prob(action))
+    :rtype tuple
+    """
     state = torch.from_numpy(state).long().unsqueeze(0)
-    state = torch.zeros(3,9).scatter_(0,state,1).view(1,27)
+    state = torch.zeros(3, 9).scatter_(0, state, 1).view(1, 27)
     pr = policy(Variable(state))
-    m = torch.distributions.Categorical(pr) 
+    m = torch.distributions.Categorical(pr)
     action = m.sample()
     log_prob = torch.sum(m.log_prob(action))
     return action.data[0], log_prob
 
-def compute_returns(rewards, gamma=1.0):
+
+def compute_returns(rewards, gamma = 1.0):
     """
     Compute returns for each time step, given the rewards
       @param rewards: list of floats, where rewards[t] is the reward
                       obtained at time step t
       @param gamma: the discount factor
       @returns list of floats representing the episode's returns
-          G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + ... 
+          G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + ...
 
     >>> compute_returns([0,0,0,1], 1.0)
     [1.0, 1.0, 1.0, 1.0]
@@ -137,7 +152,8 @@ def compute_returns(rewards, gamma=1.0):
     """
     # TODO
 
-def finish_episode(saved_rewards, saved_logprobs, gamma=1.0):
+
+def finish_episode(saved_rewards, saved_logprobs, gamma = 1.0):
     """Samples an action from the policy at the state."""
     policy_loss = []
     returns = compute_returns(saved_rewards, gamma)
@@ -148,25 +164,27 @@ def finish_episode(saved_rewards, saved_logprobs, gamma=1.0):
     for log_prob, reward in zip(saved_logprobs, returns):
         policy_loss.append(-log_prob * reward)
     policy_loss = torch.cat(policy_loss).sum()
-    policy_loss.backward(retain_graph=True)
+    policy_loss.backward(retain_graph = True)
     # note: retain_graph=True allows for multiple calls to .backward()
     # in a single step
+
 
 def get_reward(status):
     """Returns a numeric given an environment status."""
     return {
-            Environment.STATUS_VALID_MOVE  : 0, # TODO
-            Environment.STATUS_INVALID_MOVE: 0,
-            Environment.STATUS_WIN         : 0,
-            Environment.STATUS_TIE         : 0,
-            Environment.STATUS_LOSE        : 0
+        Environment.STATUS_VALID_MOVE: 0,  # TODO
+        Environment.STATUS_INVALID_MOVE: 0,
+        Environment.STATUS_WIN: 0,
+        Environment.STATUS_TIE: 0,
+        Environment.STATUS_LOSE: 0
     }[status]
 
-def train(policy, env, gamma=1.0, log_interval=1000):
+
+def train(policy, env, gamma = 1.0, log_interval = 1000):
     """Train policy gradient."""
-    optimizer = optim.Adam(policy.parameters(), lr=0.001)
+    optimizer = optim.Adam(policy.parameters(), lr = 0.001)
     scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=10000, gamma=0.9)
+        optimizer, step_size = 10000, gamma = 0.9)
     running_reward = 0
 
     for i_episode in count(1):
@@ -196,7 +214,7 @@ def train(policy, env, gamma=1.0, log_interval=1000):
             torch.save(policy.state_dict(),
                        "ttt/policy-%d.pkl" % i_episode)
 
-        if i_episode % 1 == 0: # batch_size
+        if i_episode % 1 == 0:  # batch_size
             optimizer.step()
             scheduler.step()
             optimizer.zero_grad()
@@ -206,7 +224,7 @@ def first_move_distr(policy, env):
     """Display the distribution of first moves."""
     state = env.reset()
     state = torch.from_numpy(state).long().unsqueeze(0)
-    state = torch.zeros(3,9).scatter_(0,state,1).view(1,27)
+    state = torch.zeros(3, 9).scatter_(0, state, 1).view(1, 27)
     pr = policy(Variable(state))
     return pr.data
 
@@ -217,10 +235,29 @@ def load_weights(policy, episode):
     policy.load_state_dict(weights)
 
 
+# ==================== Answers ====================
+def part1(env):
+    """
+    Play a round of tictactoe using step and render.
+    :param env: the environment
+    :type env: Environment
+    :return: None
+    :rtype: None
+    """
+    assert all(i == 0 for i in env.grid)
+    for i in range(9):
+        env.step(i)
+    env.render()
+    return
+
+
 if __name__ == '__main__':
     import sys
+
     policy = Policy()
     env = Environment()
+
+    # part1(env)
 
     if len(sys.argv) == 1:
         # `python tictactoe.py` to train the agent

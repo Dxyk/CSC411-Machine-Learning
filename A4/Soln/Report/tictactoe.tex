@@ -129,7 +129,21 @@
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		In class ``Environment", the ``grid" is represented by an 1-D array of 9 elements. Attribute ``turn" represents whose turn it is. The valid values for ``turn" is either 1 (x) or 2 (o). Attribute ``done" represents whether the game is done.
 		
+		The code and output of a game is shown in the listing below.
+		
+		\begin{lstlisting}[caption = Output of a game]
+		for i in range(9):
+			env.step(i)
+		env.render()
+		return
+		====
+		xox
+		oxo
+		x..
+		====
+		\end{lstlisting}
 		
 	\end{homeworkProblem}
 	\clearpage
@@ -141,7 +155,32 @@
 	%	PROBLEM 2
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
-		%		\noindent \textit{Question}
+
+		\begin{enumerate}
+			\item 
+			The Policy class is implemented in the listing below. The network consist of one hidden layer and the activations used are ReLU activation.
+			\begin{lstlisting}[language = python, caption = policy]
+class Policy(nn.Module):
+	def __init__(self, input_size=27, hidden_size=64, output_size=9):
+		super(Policy, self).__init__()
+		self.network = nn.Sequential(
+			nn.Linear(input_size, hidden_size),
+			nn.ReLU(),
+			nn.Linear(hidden_size, output_size),
+			nn.ReLU())
+	def forward(self, x):
+		return self.network(x)
+			\end{lstlisting}
+			
+			\item 
+			The 27-dimensional vector should be viewed as a $3 \times 9$ matrices with each column as a one-hot vector. The column number represents the position on the grid (1st column represent Environment.grid[0]), and the vector itself represents the state of the current position. The state correspond to the map in Environment.render() (\{0: '.', 1: 'x', 2: 'o'\}).
+			
+			\item 
+			The 9 values Policy returns are the probabilities that it chooses the corresponding next move (e.g. the first element represents the probability that the next move is chosen to be placed at the first element in Environment.grid).
+			
+			The select\_action samples the action according to the probabilities (stochastic) instead of choosing the maximum probability (deterministic). Then the policy is stochastic.
+			
+		\end{enumerate}
 		
 		
 	\end{homeworkProblem}
