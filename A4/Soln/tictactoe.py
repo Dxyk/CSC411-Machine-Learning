@@ -430,16 +430,17 @@ def part8(env, policy):
     load_weights(policy, 49500)
     lose_count = 0
     while lose_count < 5:
+        print("===== NEW GAME =====")
         state = env.reset()
         done = False
         status = None
         while not done:
             action, logprob = select_action(policy, state)
             state, status, done = env.play_against_random(action)
+            env.render()
         if status == Environment.STATUS_LOSE:
             lose_count += 1
             print("{} lose {} {}".format("=" * 20, lose_count, "=" * 20))
-            env.render()
     return
 
 

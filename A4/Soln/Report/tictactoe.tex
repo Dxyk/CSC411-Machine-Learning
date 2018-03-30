@@ -304,83 +304,83 @@ def compute_returns(rewards, gamma = 1.0):
 			\item 
 			By looking at the game plays, we can see that the policy is capable of understanding how to block the opponent from making a winning-move. While the policy is doing that, it also tries to place the crosses at a place that is advantageous.
 			\begin{lstlisting}
-			==================== Game 0 ====================
-			..x
-			...
-			.o.
-			====
-			.ox
-			...
-			xo.
-			====
-			.ox
-			.x.
-			xo.
-			====
-			==================== Game 1 ====================
-			o.x
-			...
-			...
-			====
-			o.x
-			..o
-			.x.
-			====
-			o.x
-			o.o
-			xx.
-			====
-			o.x
-			oxo
-			xx.
-			====
-			==================== Game 2 ====================
-			...
-			o..
-			.x.
-			====
-			..x
-			o.o
-			.x.
-			====
-			.ox
-			oxo
-			.x.
-			====
-			.ox
-			oxo
-			xx.
-			====
-			==================== Game 3 ====================
-			..x
-			...
-			o..
-			====
-			..x
-			.x.
-			o.o
-			====
-			..x
-			xx.
-			ooo
-			====
-			==================== Game 4 ====================
-			..x
-			..o
-			...
-			====
-			..x
-			.xo
-			o..
-			====
-			..x
-			.xo
-			oox
-			====
-			x.x
-			.xo
-			oox
-			====
+	==================== Game 0 ====================
+	..x
+	...
+	.o.
+	====
+	.ox
+	...
+	xo.
+	====
+	.ox
+	.x.
+	xo.
+	====
+	==================== Game 1 ====================
+	o.x
+	...
+	...
+	====
+	o.x
+	..o
+	.x.
+	====
+	o.x
+	o.o
+	xx.
+	====
+	o.x
+	oxo
+	xx.
+	====
+	==================== Game 2 ====================
+	...
+	o..
+	.x.
+	====
+	..x
+	o.o
+	.x.
+	====
+	.ox
+	oxo
+	.x.
+	====
+	.ox
+	oxo
+	xx.
+	====
+	==================== Game 3 ====================
+	..x
+	...
+	o..
+	====
+	..x
+	.x.
+	o.o
+	====
+	..x
+	xx.
+	ooo
+	====
+	==================== Game 4 ====================
+	..x
+	..o
+	...
+	====
+	..x
+	.xo
+	o..
+	====
+	..x
+	.xo
+	oox
+	====
+	x.x
+	.xo
+	oox
+	====
 			\end{lstlisting}
 		\end{enumerate}
 		
@@ -417,7 +417,7 @@ def compute_returns(rewards, gamma = 1.0):
 		%		\noindent \textit{Question}
 		The final first move distribution is [0.002, 0.0061, 0.0003, 0.0, 0.0, 0.9859, 0.0035, 0.002, 0.0002]. We can clearly see that the network understands that it should play the first move at slot 6 (grid[2, 3]).
 		
-		The distribution throughout the training process is shown in Fig.\ref{fig:7}.
+		The distribution throughout the training process is shown in Fig.\ref{fig:7}. We can see that the policy struggled between position 6 and 8 a lot. Surprisingly, it did not try to focus on position 5, which most people would.
 		
 		\begin{figure*}[!ht]
 			\centering
@@ -492,7 +492,7 @@ def compute_returns(rewards, gamma = 1.0):
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		
+		One reason that the policy fails is that it does not focus on the upper or lower rows when the opponent is about to win on the. It usually just ignore those rows even if the opponent has already have 2 stones on it.
 		
 	\end{homeworkProblem}
 	\clearpage
