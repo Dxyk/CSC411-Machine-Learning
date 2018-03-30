@@ -133,11 +133,42 @@
 		
 		The code and output of a game is shown in the listing below.
 		
-		\begin{lstlisting}[caption = Output of a game]
+		\begin{lstlisting}[caption = Code and Output of a game]
 		for i in range(9):
 			env.step(i)
-		env.render()
+			env.render()
 		return
+		x..
+		...
+		...
+		====
+		xo.
+		...
+		...
+		====
+		xox
+		...
+		...
+		====
+		xox
+		o..
+		...
+		====
+		xox
+		ox.
+		...
+		====
+		xox
+		oxo
+		...
+		====
+		xox
+		oxo
+		x..
+		====
+		xox
+		oxo
+		x..
 		====
 		xox
 		oxo
@@ -225,7 +256,21 @@ def compute_returns(rewards, gamma = 1.0):
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
-		
+		\begin{enumerate}
+			\item 
+			See tictactoe.py for implementations.
+			
+			\item 
+			The rewards are shown in the listing below.
+			
+			\begin{lstlisting}[caption = Rewards]
+	Environment.STATUS_VALID_MOVE: 1,
+	Environment.STATUS_INVALID_MOVE: -1,
+	Environment.STATUS_WIN: 10,
+	Environment.STATUS_TIE: 0,
+	Environment.STATUS_LOSE: -10
+			\end{lstlisting}
+		\end{enumerate}
 		
 	\end{homeworkProblem}
 	\clearpage
@@ -238,7 +283,25 @@ def compute_returns(rewards, gamma = 1.0):
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		\begin{enumerate}
+			\item 
+			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 1.0, max\_iter = 1000
 		
+			\begin{figure}[!ht]
+				\centering
+				\includegraphics[width=.35\linewidth]{images/5/training_curve.png}
+				\caption{caption}
+				\label{fig:5}
+			\end{figure}
+			
+			\item 
+			
+			
+			\item 
+			
+			
+			\item 
+		\end{enumerate}
 		
 	\end{homeworkProblem}
 	\clearpage

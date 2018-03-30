@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.distributions
 from torch.autograd import Variable
-
+import matplotlib.pyplot as plt
 
 class Environment(object):
     """
@@ -118,7 +118,7 @@ class Policy(nn.Module):
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, output_size),
-            nn.ReLU()
+            nn.Softmax()
         )
 
     def forward(self, x):
@@ -190,22 +190,33 @@ def finish_episode(saved_rewards, saved_logprobs, gamma = 1.0):
 def get_reward(status):
     """Returns a numeric given an environment status."""
     return {
-        Environment.STATUS_VALID_MOVE: 0,  # TODO
-        Environment.STATUS_INVALID_MOVE: 0,
-        Environment.STATUS_WIN: 0,
-        Environment.STATUS_TIE: 0,
-        Environment.STATUS_LOSE: 0
+        Environment.STATUS_VALID_MOVE: 5,  # TODO
+        Environment.STATUS_INVALID_MOVE: -5,
+        Environment.STATUS_WIN: 10,
+        Environment.STATUS_TIE: 1,
+        Environment.STATUS_LOSE: -10
     }[status]
 
 
-def train(policy, env, gamma = 1.0, log_interval = 1000):
+def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
     """Train policy gradient."""
-    optimizer = optim.Adam(policy.parameters(), lr = 0.001)
+    optimizer = optim.Adam(policy.parameters(), lr = lr)
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size = 10000, gamma = 0.9)
     running_reward = 0
 
-    for i_episode in count(1):
+    # Parameters
+    log_interval = max_iter / 100
+
+    # Records
+    iters = []
+    avg_returns = []
+
+    print("{} Start Training {}".format("=" * 20, "=" * 20))
+    print("Parameters: lr = {}, gamma = {}, max_iter = {}".format(lr, gamma, max_iter))
+    print("=" * 30)
+
+    for i_episode in range(max_iter):
         saved_rewards = []
         saved_logprobs = []
         state = env.reset()
@@ -223,12 +234,13 @@ def train(policy, env, gamma = 1.0, log_interval = 1000):
         finish_episode(saved_rewards, saved_logprobs, gamma)
 
         if i_episode % log_interval == 0:
-            print('Episode {}\tAverage return: {:.2f}'.format(
-                i_episode,
-                running_reward / log_interval))
+            avg_return = running_reward / log_interval
+            print('Episode {}\tAverage return: {:.2f}'.format(i_episode, avg_return))
             running_reward = 0
+            iters.append(i_episode)
+            avg_returns.append(avg_return)
 
-        if i_episode % (log_interval) == 0:
+        if i_episode % log_interval == 0:
             torch.save(policy.state_dict(),
                        "ttt/policy-%d.pkl" % i_episode)
 
@@ -236,6 +248,17 @@ def train(policy, env, gamma = 1.0, log_interval = 1000):
             optimizer.step()
             scheduler.step()
             optimizer.zero_grad()
+
+    print("{} Done Training {}".format("=" * 20, "=" * 20))
+
+    if plot:
+        plt.plot(iters, avg_returns, color = "b")
+        plt.ylabel("Average Returns")
+        plt.xlabel("Episodes")
+        plt.title("Training Curve")
+        plt.savefig("./Report/images/5/training_curve.png")
+        plt.show()
+    return
 
 
 def first_move_distr(policy, env):
@@ -265,7 +288,17 @@ def part1(env):
     assert all(i == 0 for i in env.grid)
     for i in range(9):
         env.step(i)
-    env.render()
+        env.render()
+    return
+
+
+def part2():
+    return
+
+
+def part3():
+    import doctest
+    doctest.testmod()
     return
 
 
@@ -276,13 +309,19 @@ if __name__ == '__main__':
     env = Environment()
 
     # part1(env)
+    # part2()
+    # part3()
+    # part4()
 
-    if len(sys.argv) == 1:
-        # `python tictactoe.py` to train the agent
-        train(policy, env)
-    else:
-        # `python tictactoe.py <ep>` to print the first move distribution
-        # using weightt checkpoint at episode int(<ep>)
-        ep = int(sys.argv[1])
-        load_weights(policy, ep)
-        print(first_move_distr(policy, env))
+    # Part 5
+    train(policy, env, gamma = 1.0, max_iter = 50000, plot = True)
+
+    # if len(sys.argv) == 1:
+    #     # `python tictactoe.py` to train the agent
+    #     train(policy, env)
+    # else:
+    #     # `python tictactoe.py <ep>` to print the first move distribution
+    #     # using weightt checkpoint at episode int(<ep>)
+    #     ep = int(sys.argv[1])
+    #     load_weights(policy, ep)
+    #     print(first_move_distr(policy, env))
