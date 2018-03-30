@@ -118,7 +118,7 @@ class Policy(nn.Module):
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, output_size),
-            nn.Softmax()
+            nn.Softmax(dim = output_size)
         )
 
     def forward(self, x):
@@ -276,6 +276,40 @@ def load_weights(policy, episode):
     policy.load_state_dict(weights)
 
 
+def get_policy_result(env, policy, rounds):
+    """
+    Get the policy results by playing rounds and count the results
+    :param env: the environment
+    :type env: Environment
+    :param policy: the policy
+    :type policy: Policy
+    :param rounds: the number of rounds to play
+    :type rounds: int
+    :return: (num_policy_win, num_rand_win, num_tie)
+    :rtype: tuple
+    """
+    num_policy_win, num_rand_win, num_tie = 0, 0, 0
+
+    for i in range(rounds):
+        state = env.reset()
+        done = False
+        while not done:
+            action, logprob = select_action(policy, state)
+            state, status, done = env.play_against_random(action)
+
+        if status == Environment.STATUS_WIN:
+            num_policy_win += 1
+        elif status == Environment.STATUS_LOSE:
+            num_rand_win += 1
+        elif status == Environment.STATUS_TIE:
+            num_tie += 1
+        else:
+            print("Wrong status: {}".format(status))
+            return
+
+    return num_policy_win, num_rand_win, num_tie
+
+
 # ==================== Answers ====================
 def part1(env):
     """
@@ -301,6 +335,14 @@ def part3():
     doctest.testmod()
     return
 
+def part4():
+    return
+
+
+def part5():
+    train(policy, env, gamma = 1.0, max_iter = 50000, plot = True)
+    return
+
 
 if __name__ == '__main__':
     import sys
@@ -312,9 +354,7 @@ if __name__ == '__main__':
     # part2()
     # part3()
     # part4()
-
-    # Part 5
-    train(policy, env, gamma = 1.0, max_iter = 50000, plot = True)
+    part5()
 
     # if len(sys.argv) == 1:
     #     # `python tictactoe.py` to train the agent

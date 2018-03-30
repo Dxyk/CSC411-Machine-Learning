@@ -261,13 +261,13 @@ def compute_returns(rewards, gamma = 1.0):
 			See tictactoe.py for implementations.
 			
 			\item 
-			The rewards are shown in the listing below.
+			The rewards are shown in the listing below. The win and lose rewards are $+10$ and $-10$ respectively. The rewards for valid move and invalid move are $+5$ and $-5$ respectively because we want to encourage the policy to make a valid move instead of one that is invalid. Also, their absolute reward values are lower than that of the win or lose rewards. This is because although we encourage the policy to make valid move, we want it to make moves that will lead to winning results more. Finally, we reward tie as 1. This is because getting a tied result is better than losing, so we encourage the policy to get a tied score just a little bit.
 			
 			\begin{lstlisting}[caption = Rewards]
-	Environment.STATUS_VALID_MOVE: 1,
-	Environment.STATUS_INVALID_MOVE: -1,
+	Environment.STATUS_VALID_MOVE: 5, 
+	Environment.STATUS_INVALID_MOVE: -5,
 	Environment.STATUS_WIN: 10,
-	Environment.STATUS_TIE: 0,
+	Environment.STATUS_TIE: 1,
 	Environment.STATUS_LOSE: -10
 			\end{lstlisting}
 		\end{enumerate}
@@ -285,7 +285,7 @@ def compute_returns(rewards, gamma = 1.0):
 		%		\noindent \textit{Question}
 		\begin{enumerate}
 			\item 
-			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 1.0, max\_iter = 1000
+			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 1.0, max\_iter = 50000
 		
 			\begin{figure}[!ht]
 				\centering
