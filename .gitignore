@@ -3,6 +3,7 @@
 cropped/
 uncropped/
 **/data/
+**/ttt/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
