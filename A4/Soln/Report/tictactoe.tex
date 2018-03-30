@@ -257,6 +257,7 @@ def compute_returns(rewards, gamma = 1.0):
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
 		\begin{enumerate}
+%			TODO
 			\item 
 			See tictactoe.py for implementations.
 			
@@ -285,7 +286,7 @@ def compute_returns(rewards, gamma = 1.0):
 		%		\noindent \textit{Question}
 		\begin{enumerate}
 			\item 
-			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 1.0, max\_iter = 50000
+			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 0.9, max\_iter = 50000. We set gamma to 0.9 to get a smoother and quicker result
 		
 			\begin{figure}[!ht]
 				\centering
@@ -295,10 +296,11 @@ def compute_returns(rewards, gamma = 1.0):
 			\end{figure}
 			
 			\item 
+			The hidden dimension was tested on values [32, 64, 128, 256]. Their results were calculated using function get\_policy\_result. The best-performing dimension was {}. It has {} wins out of 1000 round.
 			
 			
 			\item 
-			
+			The policy starts to understand not to make invalid moves at around the {1200}th iteration.  To get this result, we let the policy play with random for 100 times at each log point and count the number of invalid move and total move and thus calculate the percentage of the invalid move the policy makes. After the {1200}th iteration, all iterations' invalid move rates are less than 1\%, so the policy understands not to make invalid moves.
 			
 			\item 
 		\end{enumerate}

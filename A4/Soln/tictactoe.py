@@ -12,6 +12,7 @@ import torch.distributions
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
 
+
 class Environment(object):
     """
     The Tic-Tac-Toe Environment
@@ -118,7 +119,7 @@ class Policy(nn.Module):
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, output_size),
-            nn.Softmax(dim = output_size)
+            nn.Softmax()
         )
 
     def forward(self, x):
@@ -191,14 +192,14 @@ def get_reward(status):
     """Returns a numeric given an environment status."""
     return {
         Environment.STATUS_VALID_MOVE: 5,  # TODO
-        Environment.STATUS_INVALID_MOVE: -5,
-        Environment.STATUS_WIN: 10,
-        Environment.STATUS_TIE: 1,
-        Environment.STATUS_LOSE: -10
+        Environment.STATUS_INVALID_MOVE: -50,
+        Environment.STATUS_WIN: 100,
+        Environment.STATUS_TIE: -10,
+        Environment.STATUS_LOSE: -100
     }[status]
 
 
-def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
+def train(policy, env, lr = 0.0005, gamma = 0.9, max_iter = 50000, verbose = True, plot = False, save_policy = True):
     """Train policy gradient."""
     optimizer = optim.Adam(policy.parameters(), lr = lr)
     scheduler = torch.optim.lr_scheduler.StepLR(
@@ -219,6 +220,7 @@ def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
     for i_episode in range(max_iter):
         saved_rewards = []
         saved_logprobs = []
+
         state = env.reset()
         done = False
         while not done:
@@ -235,14 +237,17 @@ def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
 
         if i_episode % log_interval == 0:
             avg_return = running_reward / log_interval
-            print('Episode {}\tAverage return: {:.2f}'.format(i_episode, avg_return))
+            if verbose:
+                results = play_games(env, policy)
+                print('Episode {}\t'
+                      'Average return: {:.2f}'
+                      '\tInvalid: {:.4f}'.format(i_episode, avg_return, results[-1]))
             running_reward = 0
             iters.append(i_episode)
             avg_returns.append(avg_return)
 
-        if i_episode % log_interval == 0:
-            torch.save(policy.state_dict(),
-                       "ttt/policy-%d.pkl" % i_episode)
+            if save_policy:
+                torch.save(policy.state_dict(), "ttt/policy-%d.pkl" % i_episode)
 
         if i_episode % 1 == 0:  # batch_size
             optimizer.step()
@@ -250,6 +255,8 @@ def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
             optimizer.zero_grad()
 
     print("{} Done Training {}".format("=" * 20, "=" * 20))
+    result = play_games(env, policy, 1000)
+    print("Result: {} / {} / {}".format(result[0], result[1], result[2]))
 
     if plot:
         plt.plot(iters, avg_returns, color = "b")
@@ -257,7 +264,7 @@ def train(policy, env, lr = 0.001, gamma = 1.0, max_iter = 50000, plot = False):
         plt.xlabel("Episodes")
         plt.title("Training Curve")
         plt.savefig("./Report/images/5/training_curve.png")
-        plt.show()
+        # plt.show()
     return
 
 
@@ -276,7 +283,7 @@ def load_weights(policy, episode):
     policy.load_state_dict(weights)
 
 
-def get_policy_result(env, policy, rounds):
+def play_games(env, policy, rounds = 100, visualize = False):
     """
     Get the policy results by playing rounds and count the results
     :param env: the environment
@@ -289,6 +296,7 @@ def get_policy_result(env, policy, rounds):
     :rtype: tuple
     """
     num_policy_win, num_rand_win, num_tie = 0, 0, 0
+    total_move, invalid_move = 0, 0
 
     for i in range(rounds):
         state = env.reset()
@@ -296,6 +304,11 @@ def get_policy_result(env, policy, rounds):
         while not done:
             action, logprob = select_action(policy, state)
             state, status, done = env.play_against_random(action)
+            if status == Environment.STATUS_INVALID_MOVE:
+                invalid_move += 1
+            total_move += 1
+            if visualize:
+                env.render()
 
         if status == Environment.STATUS_WIN:
             num_policy_win += 1
@@ -307,7 +320,7 @@ def get_policy_result(env, policy, rounds):
             print("Wrong status: {}".format(status))
             return
 
-    return num_policy_win, num_rand_win, num_tie
+    return num_policy_win, num_rand_win, num_tie, invalid_move / float(total_move)
 
 
 # ==================== Answers ====================
@@ -335,26 +348,52 @@ def part3():
     doctest.testmod()
     return
 
+
 def part4():
     return
 
 
-def part5():
-    train(policy, env, gamma = 1.0, max_iter = 50000, plot = True)
+def part5(env, policy):
+    # a
+    train(policy, env, gamma = 0.9, max_iter = 50000, plot = True)
+    # b
+    best = []
+    for hidden_dim in [32, 64, 128, 256]:
+        test_env = Environment()
+        test_policy = Policy(hidden_size = hidden_dim)
+        train(test_policy, test_env, gamma = 0.9, max_iter = 50000, verbose = False,
+              plot = False, save_policy = False)
+        results = play_games(test_env, test_policy, rounds = 1000)
+        best.append(results)
+    print([32, 64, 128, 256], best)
+    # c
+    # train(policy, env, gamma = 0.9, max_iter = 50000, plot = True)
+    # d
+    results = play_games(env, policy, rounds = 100)
+    print("win: {}, lose: {}, tie: {}", results[0], results[1], results[2])
+    for i in range(5):
+        print("{} Game {} {}".format("=" * 20, i, "=" * 20))
+        play_games(env, policy, rounds = 1, visualize = True)
     return
 
 
 if __name__ == '__main__':
     import sys
 
-    policy = Policy()
+    # Set seeds
+    np.random.seed(59)
+    random.seed(59)
+    torch.manual_seed(59)
+
+    # Initialize env and policy
     env = Environment()
+    policy = Policy()
 
     # part1(env)
     # part2()
     # part3()
     # part4()
-    part5()
+    part5(env, policy)
 
     # if len(sys.argv) == 1:
     #     # `python tictactoe.py` to train the agent
