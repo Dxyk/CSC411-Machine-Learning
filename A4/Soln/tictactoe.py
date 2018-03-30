@@ -112,7 +112,7 @@ class Policy(nn.Module):
     The Tic-Tac-Toe Policy
     """
 
-    def __init__(self, input_size = 27, hidden_size = 64, output_size = 9):
+    def __init__(self, input_size = 27, hidden_size = 256, output_size = 9):
         super(Policy, self).__init__()
         # TODO
         self.network = nn.Sequential(
@@ -353,27 +353,93 @@ def part4():
     return
 
 
-def part5(env, policy):
-    # a
+def part5(env, policy, part_b = False):
+    # a, c
     train(policy, env, gamma = 0.9, max_iter = 50000, plot = True)
     # b
-    best = []
-    for hidden_dim in [32, 64, 128, 256]:
-        test_env = Environment()
-        test_policy = Policy(hidden_size = hidden_dim)
-        train(test_policy, test_env, gamma = 0.9, max_iter = 50000, verbose = False,
-              plot = False, save_policy = False)
-        results = play_games(test_env, test_policy, rounds = 1000)
-        best.append(results)
-    print([32, 64, 128, 256], best)
-    # c
-    # train(policy, env, gamma = 0.9, max_iter = 50000, plot = True)
+    if part_b:
+        best = []
+        for hidden_dim in [32, 64, 128, 256]:
+            test_env = Environment()
+            test_policy = Policy(hidden_size = hidden_dim)
+            train(test_policy, test_env, gamma = 0.9, max_iter = 50000, verbose = False,
+                  plot = False, save_policy = False)
+            results = play_games(test_env, test_policy, rounds = 1000)
+            best.append(results)
+        print([32, 64, 128, 256], best)
     # d
     results = play_games(env, policy, rounds = 100)
     print("win: {}, lose: {}, tie: {}", results[0], results[1], results[2])
     for i in range(5):
         print("{} Game {} {}".format("=" * 20, i, "=" * 20))
         play_games(env, policy, rounds = 1, visualize = True)
+    return
+
+
+def part6(env):
+    iters, wins, loses, ties = [], [], [], []
+    for ep in range(0, 50000, 1000):
+        policy = Policy()
+        load_weights(policy, ep)
+        results = play_games(env, policy, rounds = 100, visualize = False)
+        iters.append(ep)
+        wins.append(results[0])
+        loses.append(results[1])
+        ties.append(results[2])
+    plt.plot(iters, wins, color = "g", label = "win")
+    plt.plot(iters, loses, color = "r", label = "lose")
+    plt.plot(iters, ties, color = "b", label = "tie")
+    plt.legend(loc = "best")
+    plt.ylabel("Game Counts")
+    plt.xlabel("Episodes")
+    plt.title("Performance over episodes")
+    plt.savefig("./Report/images/6/performance_curve.png")
+    plt.show()
+    return
+
+
+def part7(env):
+    iters= []
+    moves = [[] for i in range(9)]
+    for ep in range(0, 50000, 1000):
+        policy = Policy()
+        load_weights(policy, ep)
+        move_distr = first_move_distr(policy, env)
+        move_distr = np.array(move_distr)[0]
+        for i in range(len(move_distr)):
+            moves[i].append(move_distr[i])
+        iters.append(ep)
+    for i in range(len(moves)):
+        plt.clf()
+        plt.cla()
+        plt.plot(iters, moves[i], label = "move_{}".format(i + 1))
+        plt.ylabel("probability")
+        plt.xlabel("Episodes")
+        plt.legend(loc = "best")
+        plt.title("Performance over episodes for move {}".format(i + 1))
+        plt.savefig("./Report/images/7/move_dist_{}.png".format(i + 1))
+        # plt.show()
+    policy = Policy()
+    load_weights(policy, 49500)
+    final_move_dist = np.array(first_move_distr(policy, env))[0]
+    print([float("{:.4f}".format(i)) for i in final_move_dist])
+    return
+
+
+def part8(env, policy):
+    load_weights(policy, 49500)
+    lose_count = 0
+    while lose_count < 5:
+        state = env.reset()
+        done = False
+        status = None
+        while not done:
+            action, logprob = select_action(policy, state)
+            state, status, done = env.play_against_random(action)
+        if status == Environment.STATUS_LOSE:
+            lose_count += 1
+            print("{} lose {} {}".format("=" * 20, lose_count, "=" * 20))
+            env.render()
     return
 
 
@@ -393,7 +459,10 @@ if __name__ == '__main__':
     # part2()
     # part3()
     # part4()
-    part5(env, policy)
+    # part5(env, policy, part_b = False)
+    # part6(env)
+    # part7(env)
+    part8(env, policy)
 
     # if len(sys.argv) == 1:
     #     # `python tictactoe.py` to train the agent

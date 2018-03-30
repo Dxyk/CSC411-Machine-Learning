@@ -257,19 +257,18 @@ def compute_returns(rewards, gamma = 1.0):
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
 		\begin{enumerate}
-%			TODO
 			\item 
 			See tictactoe.py for implementations.
 			
 			\item 
-			The rewards are shown in the listing below. The win and lose rewards are $+10$ and $-10$ respectively. The rewards for valid move and invalid move are $+5$ and $-5$ respectively because we want to encourage the policy to make a valid move instead of one that is invalid. Also, their absolute reward values are lower than that of the win or lose rewards. This is because although we encourage the policy to make valid move, we want it to make moves that will lead to winning results more. Finally, we reward tie as 1. This is because getting a tied result is better than losing, so we encourage the policy to get a tied score just a little bit.
+			The rewards are shown in the listing below. The win and lose rewards are $+100$ and $-100$ respectively. The reward for valid move is 5 and for invalid move is $-50$. This is because we do not want the network to make invalid moves and do not want the network to be satisfied with just making valid moves. Finally, we reward tie as $-10$. This is because getting a tied result is just a little bit better than losing, but still not what we wanted, so we discourage the policy to get a tied score.
 			
 			\begin{lstlisting}[caption = Rewards]
 	Environment.STATUS_VALID_MOVE: 5, 
-	Environment.STATUS_INVALID_MOVE: -5,
-	Environment.STATUS_WIN: 10,
-	Environment.STATUS_TIE: 1,
-	Environment.STATUS_LOSE: -10
+	Environment.STATUS_INVALID_MOVE: -50,
+	Environment.STATUS_WIN: 100,
+	Environment.STATUS_TIE: -10,
+	Environment.STATUS_LOSE: -100
 			\end{lstlisting}
 		\end{enumerate}
 		
@@ -286,23 +285,103 @@ def compute_returns(rewards, gamma = 1.0):
 		%		\noindent \textit{Question}
 		\begin{enumerate}
 			\item 
-			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.001, gamma = 0.9, max\_iter = 50000. We set gamma to 0.9 to get a smoother and quicker result
+			The training curve is shown in Fig.\ref{fig:5}. The hyperparameters are as follows: lr = 0.0005, gamma = 0.9, max\_iter = 50000. We set gamma to 0.9 to get a smoother and quicker result. We also set the learning rate to half to make sure the training does not get stuck. If the learning rate is too high, the weights will grow too fast and the policy will try to pick the same choice over and over again.
 		
 			\begin{figure}[!ht]
 				\centering
-				\includegraphics[width=.35\linewidth]{images/5/training_curve.png}
-				\caption{caption}
+				\includegraphics[width=.75\linewidth]{images/5/training_curve.png}
+				\caption{Training Curve}
 				\label{fig:5}
 			\end{figure}
 			
 			\item 
-			The hidden dimension was tested on values [32, 64, 128, 256]. Their results were calculated using function get\_policy\_result. The best-performing dimension was {}. It has {} wins out of 1000 round.
+			The hidden dimension was tested on values [32, 64, 128, 256]. Their results were calculated using function get\_policy\_result. The best-performing dimension was {256}. It has {946} wins out of 1000 round.
 			
 			
 			\item 
-			The policy starts to understand not to make invalid moves at around the {1200}th iteration.  To get this result, we let the policy play with random for 100 times at each log point and count the number of invalid move and total move and thus calculate the percentage of the invalid move the policy makes. After the {1200}th iteration, all iterations' invalid move rates are less than 1\%, so the policy understands not to make invalid moves.
+			The policy starts to understand not to make invalid moves at around the {5000}th iteration.  To get this result, we let the policy play with random for 100 times at each log point and count the number of invalid move and total move and thus calculate the percentage of the invalid move the policy makes. After the {5000}th iteration, all iterations' invalid move rates are less than 3\%, so the policy understands not to make invalid moves.
 			
 			\item 
+			By looking at the game plays, we can see that the policy is capable of understanding how to block the opponent from making a winning-move. While the policy is doing that, it also tries to place the crosses at a place that is advantageous.
+			\begin{lstlisting}
+			==================== Game 0 ====================
+			..x
+			...
+			.o.
+			====
+			.ox
+			...
+			xo.
+			====
+			.ox
+			.x.
+			xo.
+			====
+			==================== Game 1 ====================
+			o.x
+			...
+			...
+			====
+			o.x
+			..o
+			.x.
+			====
+			o.x
+			o.o
+			xx.
+			====
+			o.x
+			oxo
+			xx.
+			====
+			==================== Game 2 ====================
+			...
+			o..
+			.x.
+			====
+			..x
+			o.o
+			.x.
+			====
+			.ox
+			oxo
+			.x.
+			====
+			.ox
+			oxo
+			xx.
+			====
+			==================== Game 3 ====================
+			..x
+			...
+			o..
+			====
+			..x
+			.x.
+			o.o
+			====
+			..x
+			xx.
+			ooo
+			====
+			==================== Game 4 ====================
+			..x
+			..o
+			...
+			====
+			..x
+			.xo
+			o..
+			====
+			..x
+			.xo
+			oox
+			====
+			x.x
+			.xo
+			oox
+			====
+			\end{lstlisting}
 		\end{enumerate}
 		
 	\end{homeworkProblem}
@@ -316,6 +395,13 @@ def compute_returns(rewards, gamma = 1.0):
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		The performance for different stages are shown in Fig.\ref{fig:6}. From the graph we can clearly see that the winning rate increases from less than $60\%$ to around $80\%$ and the lose and tie rates gradually decrease. This is because we want the network to maximize reward and we only set the reward for winning to be positive, so the network learns to win more.
+		\begin{figure}[!ht]
+			\centering
+			\includegraphics[width=.75\linewidth]{images/6/performance_curve.png}
+			\caption{Performance over time}
+			\label{fig:6}
+		\end{figure}
 		
 		
 	\end{homeworkProblem}
@@ -329,7 +415,71 @@ def compute_returns(rewards, gamma = 1.0):
 	%---------------------------------------------------------------------------------
 	\begin{homeworkProblem}
 		%		\noindent \textit{Question}
+		The final first move distribution is [0.002, 0.0061, 0.0003, 0.0, 0.0, 0.9859, 0.0035, 0.002, 0.0002]. We can clearly see that the network understands that it should play the first move at slot 6 (grid[2, 3]).
 		
+		The distribution throughout the training process is shown in Fig.\ref{fig:7}.
+		
+		\begin{figure*}[!ht]
+			\centering
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_1.png}
+				\caption{Distribution for position 1}
+				\label{fig:7.1}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_2.png}
+				\caption{Distribution for position 2}
+				\label{fig:7.2}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_3.png}
+				\caption{Distribution for position 3}
+				\label{fig:7.3}
+			\end{subfigure}
+			
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_4.png}
+				\caption{Distribution for position 4}
+				\label{fig:7.4}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_5.png}
+				\caption{Distribution for position 5}
+				\label{fig:7.5}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_6.png}
+				\caption{Distribution for position 6}
+				\label{fig:7.6}
+			\end{subfigure}
+		
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_7.png}
+				\caption{Distribution for position 7}
+				\label{fig:7.7}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_8.png}
+				\caption{Distribution for position 8}
+				\label{fig:7.8}
+			\end{subfigure}
+			\begin{subfigure}{.3\textwidth}
+				\centering
+				\includegraphics[width=\linewidth]{images/7/move_dist_9.png}
+				\caption{Distribution for position 9}
+				\label{fig:7.9}
+			\end{subfigure}
+			\caption{First move distributions}
+			\label{fig:7}
+		\end{figure*}
 		
 	\end{homeworkProblem}
 	\clearpage
